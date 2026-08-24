@@ -14,6 +14,8 @@ const unavailableState: FwaDebugStateSnapshot = {
   enabled: false,
 }
 
+let cachedState: FwaDebugStateSnapshot = unavailableState
+
 export function projectFwaDebugState(
   state?: FwaDebugState,
 ): FwaDebugStateSnapshot {
@@ -21,7 +23,14 @@ export function projectFwaDebugState(
 }
 
 export function readFwaDebugState(): FwaDebugStateSnapshot {
-  return projectFwaDebugState(getFwaLocalEdge()?.debug?.getState())
+  const nextState = projectFwaDebugState(getFwaLocalEdge()?.debug?.getState())
+  if (
+    cachedState.available !== nextState.available ||
+    cachedState.enabled !== nextState.enabled
+  ) {
+    cachedState = nextState
+  }
+  return cachedState
 }
 
 export function subscribeFwaDebugState(

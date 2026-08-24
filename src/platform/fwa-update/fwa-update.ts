@@ -17,6 +17,8 @@ const unavailableState: FwaUpdateState = {
   updateAvailable: false,
 }
 
+let cachedState: FwaUpdateState = unavailableState
+
 export function projectFwaUpdateState(
   state?: LocalEdgeClientState,
 ): FwaUpdateState {
@@ -33,7 +35,16 @@ export function projectFwaUpdateState(
 }
 
 export function readFwaUpdateState(): FwaUpdateState {
-  return projectFwaUpdateState(getFwaLocalEdge()?.getState())
+  const nextState = projectFwaUpdateState(getFwaLocalEdge()?.getState())
+  if (
+    cachedState.phase !== nextState.phase ||
+    cachedState.currentReleaseId !== nextState.currentReleaseId ||
+    cachedState.availableReleaseId !== nextState.availableReleaseId ||
+    cachedState.updateAvailable !== nextState.updateAvailable
+  ) {
+    cachedState = nextState
+  }
+  return cachedState
 }
 
 export function subscribeFwaUpdateState(

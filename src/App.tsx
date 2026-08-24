@@ -1,10 +1,4 @@
-import {
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  type CSSProperties,
-} from 'react'
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import './App.css'
 import {
   DEFAULT_AUDIO_SETTINGS,
@@ -61,16 +55,10 @@ import {
   type InstrumentId,
 } from './playback/instrument'
 import { usePlayback } from './playback/usePlayback'
-import {
-  readFwaDebugState,
-  setFwaDebugEnabled,
-  subscribeFwaDebugState,
-} from './platform/fwa-debug-state'
-import {
-  applyFwaUpdate,
-  readFwaUpdateState,
-  subscribeFwaUpdateState,
-} from './platform/fwa-update'
+import { setFwaDebugEnabled } from './platform/fwa-debug-state/fwa-debug-state'
+import { useFwaDebugState } from './platform/fwa-debug-state/react/useFwaDebugState'
+import { applyFwaUpdate } from './platform/fwa-update/fwa-update'
+import { useFwaUpdateState } from './platform/fwa-update/react/useFwaUpdateState'
 import {
   DefaultDisplaySettings,
   loadDisplaySettings,
@@ -97,8 +85,8 @@ function App() {
   )
   const [audioSettings, setAudioSettings] = useState(loadAudioSettings)
   const [displaySettings, setDisplaySettings] = useState(loadDisplaySettings)
-  const [fwaDebugState, setFwaDebugState] = useState(readFwaDebugState)
-  const [fwaUpdateState, setFwaUpdateState] = useState(readFwaUpdateState)
+  const fwaDebugState = useFwaDebugState()
+  const fwaUpdateState = useFwaUpdateState()
   const [stickyPitch, setStickyPitch] = useState(false)
   const [midiInstrumentId, setMidiInstrumentId] = useState<InstrumentId>(
     loadMidiInstrument,
@@ -271,16 +259,6 @@ function App() {
   useEffect(() => {
     saveDisplaySettings(displaySettings)
   }, [displaySettings])
-
-  useEffect(
-    () => subscribeFwaUpdateState(setFwaUpdateState),
-    [],
-  )
-
-  useEffect(
-    () => subscribeFwaDebugState(setFwaDebugState),
-    [],
-  )
 
   useEffect(() => {
     savePersistentBoolean(

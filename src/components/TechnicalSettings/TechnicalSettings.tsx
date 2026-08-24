@@ -23,7 +23,7 @@ import {
 import {
   formatFwaReleaseId,
   type FwaUpdateState,
-} from '../../platform/fwa-update'
+} from '../../platform/fwa-update/fwa-update'
 
 export interface TechnicalSettingsProps {
   settings: AudioSettings
