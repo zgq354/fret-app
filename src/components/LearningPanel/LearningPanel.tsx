@@ -13,8 +13,7 @@ import {
 import type { MidiInputState } from '../../midi/useMidiInput'
 import type { InstrumentId } from '../../playback/instrument'
 import type { LearningMode } from '../../learning/playMode'
-
-export type ListenAnalysisMode = 'single' | 'polyphonic'
+import type { ListenAnalysisMode } from '../../learning/listenAnalysisMode'
 
 interface LearningPanelProps {
   learningMode: LearningMode

@@ -9,7 +9,6 @@ import {
 import { KeyboardPanel } from './components/KeyboardPanel/KeyboardPanel'
 import {
   LearningPanel,
-  type ListenAnalysisMode,
 } from './components/LearningPanel/LearningPanel'
 import { NotationPanel } from './components/NotationPanel/NotationPanel'
 import { resolvePolyphonicFeedback } from './audio/polyphonicFeedback'
@@ -29,6 +28,7 @@ import {
   resolveLearningDisplay,
   type LearningMode,
 } from './learning/playMode'
+import type { ListenAnalysisMode } from './learning/listenAnalysisMode'
 import {
   type PlayNoteRequest,
 } from './learning/playSession'
@@ -45,23 +45,17 @@ import {
   type PitchReading,
 } from './music/musicTheory'
 import { useMidiInput } from './midi/useMidiInput'
-import {
-  VOICE_RELEASE_MS,
-  type InstrumentId,
-} from './playback/instrument'
+import { VOICE_RELEASE_MS } from './playback/instrument'
 import { usePlayback } from './playback/usePlayback'
 import { setFwaDebugEnabled } from './platform/fwa-debug-state/fwa-debug-state'
 import { useFwaDebugState } from './platform/fwa-debug-state/react/useFwaDebugState'
 import { applyFwaUpdate } from './platform/fwa-update/fwa-update'
 import { useFwaUpdateState } from './platform/fwa-update/react/useFwaUpdateState'
 import { useDisplaySettings } from './settings/react/useDisplaySettings'
+import { useAppPreferences } from './settings/react/useAppPreferences'
 
 const MIN_DEMO_MIDI = 40
 const MAX_DEMO_MIDI = 88
-const PRACTICE_MODE_STORAGE_KEY = 'guitar-note-map.practice-mode.v1'
-const MIDI_INSTRUMENT_STORAGE_KEY = 'guitar-note-map.midi-instrument.v1'
-const LISTEN_ANALYSIS_MODE_STORAGE_KEY =
-  'guitar-note-map.listen-analysis-mode.v1'
 const RELEASE_STYLE = {
   '--voice-release-duration': VOICE_RELEASE_MS + 'ms',
 } as CSSProperties
@@ -70,9 +64,9 @@ function App() {
   const [preferredString, setPreferredString] = useState(2)
   const [demoMidi, setDemoMidi] = useState(64)
   const [showPitchClass, setShowPitchClass] = useState(false)
-  const [practiceStringMode, setPracticeStringMode] = useState(
-    () => loadPersistentBoolean(PRACTICE_MODE_STORAGE_KEY, false),
-  )
+  const { preferences, setPreference } = useAppPreferences()
+  const { practiceStringMode, midiInstrumentId, listenAnalysisMode } =
+    preferences
   const {
     settings: audioSettings,
     updateSettings: updateAudioSettings,
@@ -86,15 +80,10 @@ function App() {
   const fwaDebugState = useFwaDebugState()
   const fwaUpdateState = useFwaUpdateState()
   const [stickyPitch, setStickyPitch] = useState(false)
-  const [midiInstrumentId, setMidiInstrumentId] = useState<InstrumentId>(
-    loadMidiInstrument,
-  )
   const [latestDetectedReading, setLatestDetectedReading] =
     useState<PitchReading | null>(null)
   const [latestDetectedChord, setLatestDetectedChord] =
     useState<ChordReading | null>(null)
-  const [listenAnalysisMode, setListenAnalysisMode] =
-    useState<ListenAnalysisMode>(loadListenAnalysisMode)
   const [learningMode, setLearningMode] = useState<LearningMode>('listen')
   const [playModeInviteOpen, setPlayModeInviteOpen] = useState(false)
   const [technicalSettingsOpen, setTechnicalSettingsOpen] = useState(false)
@@ -250,21 +239,6 @@ function App() {
     }
   }, [isListening, polyphonicPitchDetection.reading])
 
-  useEffect(() => {
-    savePersistentBoolean(
-      PRACTICE_MODE_STORAGE_KEY,
-      practiceStringMode,
-    )
-  }, [practiceStringMode])
-
-  useEffect(() => {
-    saveMidiInstrument(midiInstrumentId)
-  }, [midiInstrumentId])
-
-  useEffect(() => {
-    saveListenAnalysisMode(listenAnalysisMode)
-  }, [listenAnalysisMode])
-
   const updateFwaDebugEnabled = (enabled: boolean) => {
     setFwaDebugEnabled(enabled)
   }
@@ -306,7 +280,7 @@ function App() {
     polyphonicPitchDetection.dispose()
     setLatestDetectedReading(null)
     setLatestDetectedChord(null)
-    setListenAnalysisMode(mode)
+    setPreference('listenAnalysisMode', mode)
   }
 
   const enableMicrophone = () => {
@@ -506,7 +480,9 @@ function App() {
             void playback.prepare()
             void midiInput.connect()
           }}
-          onMidiInstrumentChange={setMidiInstrumentId}
+          onMidiInstrumentChange={(instrumentId) =>
+            setPreference('midiInstrumentId', instrumentId)
+          }
         />
 
         {audioErrorMessage ? (
@@ -587,7 +563,10 @@ function App() {
                     aria-label="练习弦模式"
                     aria-pressed={practiceStringMode}
                     onClick={() =>
-                      setPracticeStringMode((current) => !current)
+                      setPreference(
+                        'practiceStringMode',
+                        !practiceStringMode,
+                      )
                     }
                   >
                     <span className="toggle-indicator" />
@@ -824,58 +803,4 @@ function resolveSourceLabel({
   }
 
   return fallback
-}
-
-function loadListenAnalysisMode(): ListenAnalysisMode {
-  try {
-    return window.localStorage.getItem(LISTEN_ANALYSIS_MODE_STORAGE_KEY) ===
-      'polyphonic'
-      ? 'polyphonic'
-      : 'single'
-  } catch {
-    return 'single'
-  }
-}
-
-function saveListenAnalysisMode(mode: ListenAnalysisMode): void {
-  try {
-    window.localStorage.setItem(LISTEN_ANALYSIS_MODE_STORAGE_KEY, mode)
-  } catch {
-    // Storage can be unavailable in private or restricted browser contexts.
-  }
-}
-
-function loadPersistentBoolean(key: string, fallback: boolean): boolean {
-  try {
-    const stored = window.localStorage.getItem(key)
-    return stored === null ? fallback : stored === 'true'
-  } catch {
-    return fallback
-  }
-}
-
-function savePersistentBoolean(key: string, value: boolean): void {
-  try {
-    window.localStorage.setItem(key, String(value))
-  } catch {
-    // Storage can be unavailable in private or restricted browser contexts.
-  }
-}
-
-function loadMidiInstrument(): InstrumentId {
-  try {
-    return window.localStorage.getItem(MIDI_INSTRUMENT_STORAGE_KEY) === 'guitar'
-      ? 'guitar'
-      : 'piano'
-  } catch {
-    return 'piano'
-  }
-}
-
-function saveMidiInstrument(instrumentId: InstrumentId): void {
-  try {
-    window.localStorage.setItem(MIDI_INSTRUMENT_STORAGE_KEY, instrumentId)
-  } catch {
-    // Storage can be unavailable in private or restricted browser contexts.
-  }
 }
