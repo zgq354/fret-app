@@ -1,77 +1,73 @@
 # 弦音地图 · Fret & Key
 
-一个纯前端 Guitar Note Map：可以从麦克风检测乐器单音，也可以用实验性的多音模式识别同一件乐器发出的和声；还可以直接弹奏指板和钢琴键，把音符同步投影到吉他指板、钢琴键盘和五线谱。声乐输入仍可使用，但不是产品主叙事。
+[立即体验](https://fret-app.zgq.me/) · [源码](https://github.com/zgq354/fret-app) · [English](README.en.md)
+
+弦音地图是一款在浏览器中使用的吉他与钢琴音符地图。通过麦克风、触控或 MIDI 输入，演奏中的音高会同步显示在吉他指板、钢琴键盘和五线谱上，便于把听到、弹到和看到的音高对应起来。
+
+它适合刚开始熟悉吉他指板的音乐初学者，用声音和触控建立音名、琴弦与品位之间的对应。
+
+无需注册。桌面浏览器可以直接使用，也可与 Android 一样安装为 PWA；iOS 与 iPadOS 可以通过 Safari 的“添加到主屏幕”作为 WebClip 使用。用支持麦克风的浏览器打开 [线上版本](https://fret-app.zgq.me/) 即可开始。
+
+## 可以怎样使用
+
+- **听音与找位**：弹奏吉他或其他单音乐器，查看音名及其在标准调弦吉他指板上的全部位置。
+- **对照多种视图**：同一个音高同时映射到指板、钢琴键盘和五线谱。
+- **直接弹奏**：点击或触摸指板、钢琴键盘，听取本地合成音色并观察对应关系。
+- **连接 MIDI**：桌面 Chrome 可以连接 MIDI 键盘或其他输入设备。
+- **实验性多音识别**：对单件乐器、钢琴或人声和声的短窗口分析会显示音符集合与候选和弦。
+
+## 开始体验
+
+1. 在桌面浏览器或移动设备的 HTTPS 页面打开应用；浏览器只有在 HTTPS 或 localhost 场景下才会开放麦克风。
+2. 允许麦克风后，先尝试清晰的单音演奏；多音模式属于实验功能。
+3. 桌面浏览器与 Android 可从浏览器菜单安装 PWA；iPhone 或 iPad 可在 Safari 中选择“添加到主屏幕”，以 WebClip 方式使用。
+
+首次在线打开后，应用会在后台准备完整的离线版本；之后即使暂时断网，仍可以启动界面并使用单音与多音检测。麦克风授权仍由浏览器和系统按站点管理。
+
+## 当前边界
+
+- 标准调弦、默认 20 品的吉他指板；不处理特殊调弦。
+- 单声道麦克风无法判断同一音高实际来自哪一根弦，因此会显示所有可能位置。
+- 多音模式不是多乐器混音分离，也不用于连续歌曲转录。
+- 弹奏与麦克风监听不能同时进行；当前没有账号、云端保存或后端服务。
+- 中央 C 的编号可按科学音高、Yamaha / Logic 或 FL Studio 切换；切换只影响显示，不改变实际音高。
+
+## 技术与验证
+
+弦音地图是纯静态 Web 应用，使用 React、TypeScript、Web Audio API 和数据驱动 SVG。多音转录使用 Spotify 的 [Basic Pitch](https://github.com/spotify/basic-pitch-ts) 浏览器实现，和弦候选使用 [Tonal](https://github.com/tonaljs/tonal)。离线 release 由 [`@fullstack-webapp/local-edge`](https://www.npmjs.com/package/@fullstack-webapp/local-edge) 提供浏览器侧的原子更新与恢复边界。
+
+公开 CI 会运行 lint、类型检查、单元测试、Local Edge 浏览器测试和生产构建：
+
+```sh
+pnpm run ci
+```
+
+默认分支的生产发布由 GitHub Actions 执行。公开 CI 不读取构建配置或 Cloudflare 凭据；只有受保护的 `pages-production` environment 才能注入生产构建与 Cloudflare Pages 所需配置，并在发布后检查 [线上版本](https://fret-app.zgq.me/)。
 
 ## 本地运行
 
-    pnpm install
-    pnpm dev
+需要 Node.js 24 和 pnpm 11。
 
-麦克风 API 需要 HTTPS 或 localhost。局域网 HTTP 地址可以预览界面，但浏览器不会开放麦克风；Cloudflare Pages 部署环境使用 HTTPS。
+```sh
+pnpm install --frozen-lockfile
+pnpm dev
+```
 
-## 检查
+常用检查：
 
-    pnpm test
-    pnpm lint
-    pnpm typecheck
-    pnpm build
+```sh
+pnpm lint
+pnpm typecheck
+pnpm test
+pnpm build
+```
 
-完整的公开 CI 矩阵使用：
+`pnpm build` 会生成 PWA 图标、iPhone / iPad 启动图、Local Edge loader、Service Worker 与 release descriptor，并校验生成资产、manifest、iOS metadata 和离线 release。生成目录 `public/icons/`、`public/splash/` 不进入 Git。
 
-    pnpm run ci
+## 反馈与问题
 
-`pnpm build` 会从 `public/favicon.svg` 幂等生成 PWA 图标与 iPhone / iPad 启动图，通过 FWA build entry 生成同源 loader、唯一 Service Worker 与原子 release descriptor，并在构建末尾检查 manifest、Local Edge、iOS metadata 和生成资产是否完整。生成目录 `public/icons/`、`public/splash/` 不进入 Git。
-
-## 安装到 iPhone / iPad
-
-1. 使用 Safari 打开 production 地址。
-2. 点击“共享”，选择“添加到主屏幕”。
-3. 从主屏幕启动“弦音地图”，以 standalone 模式使用。
-
-首次在线打开后，Local Edge 会在后台完整校验并提交 app shell、分析 Worker、Basic Pitch model 与 PCM worklet；此后离线仍可启动界面并使用单音 / 多音检测能力。Startup splash 不参与这份原子 release。麦克风授权仍由 iOS 按站点 / Web App 管理。设置中的“FWA 调试工具”会写入 loader 的 `__fwa_debug` 本地偏好并刷新当前页面，便于 standalone 内开启或关闭 diagnostics；它不改变缓存与离线策略。
-
-现代 iOS 上，弹奏模式通过 Audio Session API 使用 `playback` 类别，使主动点按产生的乐器音频不受系统静音模式影响；麦克风监听期间改用 `play-and-record`，停止后恢复 `auto`。不支持该 API 的浏览器维持原有 Web Audio 行为。
-
-## 部署
-
-Production：https://fret-app.zgq.me/
-
-Cloudflare Pages fallback：https://guitar-theory-visualizer.pages.dev/
-
-默认分支由 GitHub Actions 发布。普通 push / PR 的 `CI` workflow 不读取构建配置或 Cloudflare 凭据；只有 `main` 的 `Deploy Pages` job 进入受保护的 `pages-production` environment 后，才会注入下列 GitHub Environment secrets：
-
-- `CF_WEB_ANALYTICS_TOKEN`：生产构建的 Cloudflare Web Analytics snippet 配置。
-- `CLOUDFLARE_ACCOUNT_ID`：目标 Pages account。
-- `CLOUDFLARE_API_TOKEN`：仅能部署该 Pages project 的最小权限 token。
-
-部署 job 先重跑完整公开矩阵，再用 `pnpm build:production` 生成带 Analytics beacon 的 release，最后执行 `wrangler pages deploy dist --project-name guitar-theory-visualizer --branch main` 和 production deployment check。源仓不读取 `.env` 文件；本地 `pnpm build` 保持无配置、可复现的公开验证入口。
-
-Cloudflare Web Analytics 使用官方的手动 JS Snippet 安装模式。Pages 项目需在 Web Analytics 的 Manage site 中选择 `Enable with JS Snippet installation`，避免一键自动安装在部署阶段改写 HTML。查看真实公开访问量时，在 Cloudflare Dashboard 的 Web Analytics 页面设置 `Host = fret-app.zgq.me` 并开启 `Exclude Bots = Yes`，排除 preview 与机器人。
-
-SEO 基线由 `index.html`、`public/robots.txt`、`public/sitemap.xml` 和构建生成的 `public/assets/social-preview.png` 组成；`pnpm check:site` 校验 canonical URL、Open Graph、结构化数据和分享图尺寸。发布后运行 `pnpm check:deployment -- <production-url>`，防止缺失图片被 SPA fallback 伪装成 `HTTP 200 + text/html`。旧 `/social-preview.png` 通过 Pages `_redirects` 永久跳转到标准 assets 路径。
-
-实验分支可在不使用 production environment 的前提下进行手动 Pages preview，不更新 production alias：
-
-    wrangler pages deploy dist --project-name guitar-theory-visualizer --branch <git-branch>
-    pnpm check:deployment -- --without-analytics <preview-url>
-
-## v0 边界
-
-- 标准调弦、默认 20 品（对应 Yamaha FG830 等常见钢弦木吉他）、单音精调
-- 实验性多音模式面向单件吉他、钢琴或人声和声，使用约 2 秒滚动窗口输出音符集合与候选和弦；单音旋律不会被窗口直接合并为和弦
-- 弹奏模式可点击 / 触摸任意指板品位或钢琴键，以两种本地生成音色即时发声并同步四个学习视图
-- 桌面 Chrome 可通过 Web MIDI 连接输入设备，热插拔、复音 Note On / Note Off、velocity 与 Guitar / Piano 音色切换复用同一弹奏会话
-- 弹奏模式与麦克风监听互斥；两套音色由原生 Web Audio 生成，不加载采样包
-- 练习弦模式默认关闭；开启后可手动选择练习弦，并区分该弦与其他同音位置
-- 中央 C 编号支持科学音高 C4、Yamaha / Logic C3 与 FL Studio C5；切换只改变音名展示，不改变频率、MIDI、发声或乐器位置
-- 麦克风灵敏度、单音 / 多音阈值、稳定窗口、采集格式和浏览器音频处理均可调，参数保存在本机且可单项恢复默认
-- React + TypeScript + Web Audio API + 数据驱动 SVG
-- 纯静态构建，已通过 Direct Upload 部署到 Cloudflare Pages
-
-多音转录复用 Spotify 的 [Basic Pitch](https://github.com/spotify/basic-pitch-ts) 浏览器实现和官方 onset / frame 解码器，和弦候选复用 [Tonal](https://github.com/tonaljs/tonal)。模型原理与评估见 [Basic Pitch 论文](https://arxiv.org/abs/2203.09893)。
+暂不开放外部贡献。欢迎通过 [GitHub Issues](https://github.com/zgq354/fret-app/issues) 提出问题、bug 或使用反馈；如计划投入 Pull Request，请先开 Issue 沟通。外部 PR 目前不在维护范围内，不承诺审核或合入。
 
 ## License
 
 本仓自有代码以 [MIT](LICENSE) 发布。第三方依赖及构建时复制的 Basic Pitch 模型分别遵循其自身许可证；`@spotify/basic-pitch` 与 `@tensorflow/tfjs` 为 Apache-2.0，Tonal、React 与 React DOM 为 MIT。
-
-暂不覆盖多乐器混音分离、自动判断实际琴弦、连续歌曲转录、特殊调弦、账号或后端。普通单声道麦克风无法唯一恢复同音高对应的真实琴弦，因此指板继续展示全部候选位置。
