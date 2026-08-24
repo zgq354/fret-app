@@ -1,44 +1,31 @@
-import {
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  type CSSProperties,
-} from 'react'
+import { useMemo, useRef, useState, type CSSProperties } from 'react'
 import './App.css'
-import {
-  DEFAULT_AUDIO_SETTINGS,
-  loadAudioSettings,
-  normalizeAudioSettings,
-  saveAudioSettings,
-} from './audio/audioSettings'
-import { usePitchDetection } from './audio/usePitchDetection'
-import { usePolyphonicPitchDetection } from './audio/usePolyphonicPitchDetection'
+import { useAudioSettings } from './audio/react/useAudioSettings'
+import { usePitchDetection } from './audio/react/usePitchDetection'
+import { usePolyphonicPitchDetection } from './audio/react/usePolyphonicPitchDetection'
+import { FretboardPanel } from './components/FretboardPanel/FretboardPanel'
+import { KeyboardPanel } from './components/KeyboardPanel/KeyboardPanel'
+import { LearningPanel } from './components/LearningPanel/LearningPanel'
+import { NotationPanel } from './components/NotationPanel/NotationPanel'
 import { resolvePolyphonicFeedback } from './audio/polyphonicFeedback'
 import type {
   PolyphonicAnalysisState,
   PolyphonicModelState,
 } from './audio/polyphonicInferenceMessages'
 import { EntryDialog } from './components/EntryDialog/EntryDialog'
-import { FretboardSvg } from './components/FretboardSvg/FretboardSvg'
-import { MidiInputControl } from './components/MidiInputControl/MidiInputControl'
-import { PianoKeyboard } from './components/PianoKeyboard/PianoKeyboard'
-import { PitchMeter } from './components/PitchMeter/PitchMeter'
+import type { PlayGestureMode } from './components/GestureModeSwitch/GestureModeSwitch'
 import { TechnicalSettingsDialog } from './components/TechnicalSettings/TechnicalSettingsDialog'
-import {
-  StaffView,
-  type StaffNotationMode,
-} from './components/StaffView/StaffView'
+import type { StaffNotationMode } from './components/StaffView/StaffView'
 import {
   canPromptPlayMode,
   resolveLearningDisplay,
   type LearningMode,
 } from './learning/playMode'
-import {
-  type PlayNoteRequest,
-} from './learning/playSession'
-import { usePlaySession } from './learning/usePlaySession'
-import { getFretPosition, STANDARD_TUNING } from './music/fretboard'
+import type { ListenAnalysisMode } from './learning/listenAnalysisMode'
+import type { PlayNoteRequest } from './learning/playSession'
+import { useListeningHistory } from './learning/react/useListeningHistory'
+import { usePlaySession } from './learning/react/usePlaySession'
+import { getFretPosition } from './music/fretboard'
 import type { ChordReading } from './music/chordAnalysis'
 import {
   createPitchReading,
@@ -49,62 +36,42 @@ import {
   type MiddleCStyle,
   type PitchReading,
 } from './music/musicTheory'
-import { useMidiInput } from './midi/useMidiInput'
-import {
-  VOICE_RELEASE_MS,
-  type InstrumentId,
-} from './playback/instrument'
-import { usePlayback } from './playback/usePlayback'
-import {
-  readFwaDebugState,
-  setFwaDebugEnabled,
-  subscribeFwaDebugState,
-} from './platform/fwa-debug-state'
-import {
-  applyFwaUpdate,
-  readFwaUpdateState,
-  subscribeFwaUpdateState,
-} from './platform/fwa-update'
-import {
-  DefaultDisplaySettings,
-  loadDisplaySettings,
-  normalizeDisplaySettings,
-  saveDisplaySettings,
-} from './settings/displaySettings'
+import { useMidiInput } from './midi/react/useMidiInput'
+import { VOICE_RELEASE_MS } from './playback/instrument'
+import { usePlayback } from './playback/react/usePlayback'
+import { setFwaDebugEnabled } from './platform/fwa-debug-state/fwa-debug-state'
+import { useFwaDebugState } from './platform/fwa-debug-state/react/useFwaDebugState'
+import { applyFwaUpdate } from './platform/fwa-update/fwa-update'
+import { useFwaUpdateState } from './platform/fwa-update/react/useFwaUpdateState'
+import { useDisplaySettings } from './settings/react/useDisplaySettings'
+import { useAppPreferences } from './settings/react/useAppPreferences'
 
 const MIN_DEMO_MIDI = 40
 const MAX_DEMO_MIDI = 88
-const PRACTICE_MODE_STORAGE_KEY = 'guitar-note-map.practice-mode.v1'
-const MIDI_INSTRUMENT_STORAGE_KEY = 'guitar-note-map.midi-instrument.v1'
-const LISTEN_ANALYSIS_MODE_STORAGE_KEY =
-  'guitar-note-map.listen-analysis-mode.v1'
 const RELEASE_STYLE = {
   '--voice-release-duration': VOICE_RELEASE_MS + 'ms',
 } as CSSProperties
-type PlayGestureMode = 'scroll' | 'glissando'
-type ListenAnalysisMode = 'single' | 'polyphonic'
 
 function App() {
   const [preferredString, setPreferredString] = useState(2)
   const [demoMidi, setDemoMidi] = useState(64)
   const [showPitchClass, setShowPitchClass] = useState(false)
-  const [practiceStringMode, setPracticeStringMode] = useState(
-    () => loadPersistentBoolean(PRACTICE_MODE_STORAGE_KEY, false),
-  )
-  const [audioSettings, setAudioSettings] = useState(loadAudioSettings)
-  const [displaySettings, setDisplaySettings] = useState(loadDisplaySettings)
-  const [fwaDebugState, setFwaDebugState] = useState(readFwaDebugState)
-  const [fwaUpdateState, setFwaUpdateState] = useState(readFwaUpdateState)
+  const { preferences, setPreference } = useAppPreferences()
+  const { practiceStringMode, midiInstrumentId, listenAnalysisMode } =
+    preferences
+  const {
+    settings: audioSettings,
+    updateSettings: updateAudioSettings,
+    resetSettings: resetAudioSettings,
+  } = useAudioSettings()
+  const {
+    settings: displaySettings,
+    updateSettings: updateDisplaySettings,
+    resetSettings: resetDisplaySettings,
+  } = useDisplaySettings()
+  const fwaDebugState = useFwaDebugState()
+  const fwaUpdateState = useFwaUpdateState()
   const [stickyPitch, setStickyPitch] = useState(false)
-  const [midiInstrumentId, setMidiInstrumentId] = useState<InstrumentId>(
-    loadMidiInstrument,
-  )
-  const [latestDetectedReading, setLatestDetectedReading] =
-    useState<PitchReading | null>(null)
-  const [latestDetectedChord, setLatestDetectedChord] =
-    useState<ChordReading | null>(null)
-  const [listenAnalysisMode, setListenAnalysisMode] =
-    useState<ListenAnalysisMode>(loadListenAnalysisMode)
   const [learningMode, setLearningMode] = useState<LearningMode>('listen')
   const [playModeInviteOpen, setPlayModeInviteOpen] = useState(false)
   const [technicalSettingsOpen, setTechnicalSettingsOpen] = useState(false)
@@ -145,6 +112,17 @@ function App() {
     learningMode === 'listen' && microphoneDetection.status === 'listening'
   const isPolyphonicListening =
     isListening && listenAnalysisMode === 'polyphonic'
+
+  const {
+    latestDetectedReading,
+    latestDetectedChord,
+    clear: clearListeningHistory,
+  } = useListeningHistory({
+    isListening,
+    mode: listenAnalysisMode,
+    pitchReading: singlePitchDetection.reading,
+    chordReading: polyphonicPitchDetection.reading,
+  })
   const learningDisplay = useMemo(
     () =>
       resolveLearningDisplay({
@@ -248,66 +226,6 @@ function App() {
     microphoneDetection.status,
   )
 
-  useEffect(() => {
-    if (isListening && singlePitchDetection.reading) {
-      setLatestDetectedReading(singlePitchDetection.reading)
-    }
-  }, [isListening, singlePitchDetection.reading])
-
-  useEffect(() => {
-    if (isListening && polyphonicPitchDetection.reading) {
-      setLatestDetectedChord(polyphonicPitchDetection.reading)
-    }
-  }, [isListening, polyphonicPitchDetection.reading])
-
-  useEffect(() => {
-    saveAudioSettings(audioSettings)
-  }, [audioSettings])
-
-  useEffect(() => {
-    saveDisplaySettings(displaySettings)
-  }, [displaySettings])
-
-  useEffect(
-    () => subscribeFwaUpdateState(setFwaUpdateState),
-    [],
-  )
-
-  useEffect(
-    () => subscribeFwaDebugState(setFwaDebugState),
-    [],
-  )
-
-  useEffect(() => {
-    savePersistentBoolean(
-      PRACTICE_MODE_STORAGE_KEY,
-      practiceStringMode,
-    )
-  }, [practiceStringMode])
-
-  useEffect(() => {
-    saveMidiInstrument(midiInstrumentId)
-  }, [midiInstrumentId])
-
-  useEffect(() => {
-    saveListenAnalysisMode(listenAnalysisMode)
-  }, [listenAnalysisMode])
-
-  const updateAudioSettings = (
-    patch: Partial<typeof audioSettings>,
-  ) => {
-    setAudioSettings((current) =>
-      normalizeAudioSettings({ ...current, ...patch }),
-    )
-  }
-
-  const updateDisplaySettings = (
-    patch: Partial<typeof displaySettings>,
-  ) => {
-    setDisplaySettings((current) =>
-      normalizeDisplaySettings({ ...current, ...patch }),
-    )
-  }
 
   const updateFwaDebugEnabled = (enabled: boolean) => {
     setFwaDebugEnabled(enabled)
@@ -332,8 +250,7 @@ function App() {
     if (mode === 'play') {
       singlePitchDetection.stop()
       polyphonicPitchDetection.dispose()
-      setLatestDetectedReading(null)
-      setLatestDetectedChord(null)
+      clearListeningHistory()
     } else {
       playback.stopAll()
     }
@@ -348,14 +265,12 @@ function App() {
 
     singlePitchDetection.stop()
     polyphonicPitchDetection.dispose()
-    setLatestDetectedReading(null)
-    setLatestDetectedChord(null)
-    setListenAnalysisMode(mode)
+    clearListeningHistory()
+    setPreference('listenAnalysisMode', mode)
   }
 
   const enableMicrophone = () => {
-    setLatestDetectedReading(null)
-    setLatestDetectedChord(null)
+    clearListeningHistory()
     void microphoneDetection.start()
   }
 
@@ -485,8 +400,8 @@ function App() {
                 onFwaDebugChange={updateFwaDebugEnabled}
                 onApplyFwaUpdate={applyFwaUpdate}
                 onReset={() => {
-                  setAudioSettings({ ...DEFAULT_AUDIO_SETTINGS })
-                  setDisplaySettings({ ...DefaultDisplaySettings })
+                  resetAudioSettings()
+                  resetDisplaySettings()
                 }}
                 onDismiss={() => {
                   setTechnicalSettingsOpen(false)
@@ -501,302 +416,59 @@ function App() {
       </header>
 
       <main className={practiceStringMode ? 'has-practice-string' : undefined}>
-        <section className="top-grid">
-          <div className="intro">
-            <p className="eyebrow">声音 → 乐理 → 位置</p>
-            <h1>识别音符所在位置</h1>
-            <p className="intro-copy">
-              弹一个音或一组和声；识别结果会同时落到指板、键盘和五线谱上。
-            </p>
-          </div>
-          <PitchMeter
-            reading={activeReading}
-            middleCStyle={displaySettings.middleCStyle}
-            sourceLabel={sourceLabel}
-            readingMeta={readingMeta}
-            meterContent={
-              learningMode === 'play' ? (
-                <div className="polyphonic-panel" aria-live="polite">
-                  <span className="polyphonic-label">
-                    {playSession.displayMidis.length === 0
-                      ? '弹奏音'
-                      : playSession.isActive
-                        ? '弹奏中 · ' + playSession.displayMidis.length + ' 音'
-                        : playSession.isTransient
-                          ? '弹奏音 · ' + playSession.displayMidis.length + ' 音'
-                          : playSession.isReleasing
-                            ? '尾音 · ' + playSession.displayMidis.length + ' 音'
-                            : playSession.isRecent
-                              ? '最近弹奏 · ' + playSession.displayMidis.length + ' 音'
-                              : '弹奏音 · ' + playSession.displayMidis.length + ' 音'}
-                  </span>
-                  <strong>{noteSummary}</strong>
-                  <span className="polyphonic-hint">
-                    {playSession.isActive
-                      ? '多指可分别滑动与释放'
-                      : playSession.isTransient
-                        ? '点击后短暂显示当前音'
-                        : playSession.isReleasing
-                          ? '释放后自然衰减中'
-                          : playSession.isRecent
-                            ? '粘滞已保留最近弹奏'
-                            : '切到滑奏可多指按住发声'}
-                  </span>
-                </div>
-              ) : listenAnalysisMode === 'polyphonic' && isListening ? (
-                <div
-                  className={
-                    'polyphonic-panel is-' +
-                    polyphonicFeedback.appearance
-                  }
-                  aria-live="polite"
-                  aria-busy={polyphonicFeedback.isBusy}
-                >
-                  <div className="polyphonic-status-row">
-                    <span className="polyphonic-label">
-                      {polyphonicFeedback.label}
-                    </span>
-                    <span
-                      className="polyphonic-input-level"
-                      role="meter"
-                      aria-label="麦克风输入电平"
-                      aria-live="off"
-                      aria-valuemin={0}
-                      aria-valuemax={100}
-                      aria-valuenow={Math.round(
-                        polyphonicPitchDetection.inputLevel * 100,
-                      )}
-                    >
-                      <span
-                        style={{
-                          width:
-                            Math.round(
-                              polyphonicPitchDetection.inputLevel * 100,
-                            ) + '%',
-                        }}
-                      />
-                    </span>
-                  </div>
-                  <strong>{polyphonicFeedback.title}</strong>
-                  <span className="polyphonic-hint">
-                    {visibleChordReading &&
-                    hasLiveChord &&
-                    polyphonicPitchDetection.analysisState === 'result'
-                      ? formatNoteFrequencySummary(
-                          visibleChordReading.midis,
-                          displaySettings.middleCStyle,
-                        )
-                      : polyphonicFeedback.hint}
-                  </span>
-                </div>
-              ) : undefined
+        <LearningPanel
+          learningMode={learningMode}
+          listenAnalysisMode={listenAnalysisMode}
+          isListening={isListening}
+          microphoneRequesting={microphoneDetection.status === 'requesting'}
+          activeReading={activeReading}
+          activeMidi={activeMidi}
+          middleCStyle={displaySettings.middleCStyle}
+          sourceLabel={sourceLabel}
+          readingMeta={readingMeta}
+          play={{
+            displayMidis: playSession.displayMidis,
+            noteSummary,
+            isActive: playSession.isActive,
+            isTransient: playSession.isTransient,
+            isReleasing: playSession.isReleasing,
+            isRecent: playSession.isRecent,
+            sticky: playSession.sticky,
+            onToggleSticky: () =>
+              playSession.setSticky((current) => !current),
+          }}
+          polyphonic={{
+            feedback: polyphonicFeedback,
+            inputLevel: polyphonicPitchDetection.inputLevel,
+            analysisState: polyphonicPitchDetection.analysisState,
+            visibleChordReading,
+            hasLiveChord,
+          }}
+          stickyPitch={stickyPitch}
+          demoMidi={demoMidi}
+          minDemoMidi={MIN_DEMO_MIDI}
+          maxDemoMidi={MAX_DEMO_MIDI}
+          midi={midiInput}
+          midiInstrumentId={midiInstrumentId}
+          onSelectLearningMode={selectLearningMode}
+          onSelectListenAnalysisMode={selectListenAnalysisMode}
+          onToggleMicrophone={() => {
+            if (isListening) {
+              microphoneDetection.stop()
+            } else {
+              enableMicrophone()
             }
-            readingControl={
-              learningMode === 'play' ? (
-                <div className="pitch-control-group pitch-demo-control">
-                  <span className="control-label">弹奏音</span>
-                  <div className="pitch-demo-row">
-                    <output className="play-note-output" aria-live="polite">
-                      {activeMidi === null
-                        ? '等待点击'
-                        : formatNoteLabel(
-                            midiToNote(activeMidi),
-                            displaySettings.middleCStyle,
-                          )}
-                    </output>
-                    <button
-                      type="button"
-                      className={
-                        'sticky-mode-button' +
-                        (playSession.sticky ? ' is-selected' : '')
-                      }
-                      aria-pressed={playSession.sticky}
-                      title="释放后保留最近弹奏"
-                      onClick={() =>
-                        playSession.setSticky((current) => !current)
-                      }
-                    >
-                      <span aria-hidden="true" />
-                      粘滞
-                    </button>
-                  </div>
-                </div>
-              ) : listenAnalysisMode === 'polyphonic' && isListening ? (
-                <div className="pitch-control-group pitch-demo-control">
-                  <div className="pitch-demo-heading">
-                    <span className="control-label">识别和声</span>
-                  </div>
-                  <div className="pitch-demo-row">
-                    <output className="play-note-output" aria-live="polite">
-                      {polyphonicFeedback.shortLabel}
-                    </output>
-                    <button
-                      type="button"
-                      className={
-                        'sticky-mode-button' +
-                        (stickyPitch ? ' is-selected' : '')
-                      }
-                      aria-pressed={stickyPitch}
-                      title="无新和声时保留最后识别结果"
-                      onClick={() => setStickyPitch((current) => !current)}
-                    >
-                      <span aria-hidden="true" />
-                      粘滞
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <div className="pitch-control-group pitch-demo-control">
-                  <div className="pitch-demo-heading">
-                    <span className="control-label">
-                      {isListening ? '识别音' : '演示音'}
-                    </span>
-                  </div>
-                  <div className="pitch-demo-row">
-                    <div className="stepper">
-                      <button
-                        type="button"
-                        aria-label="降低半音"
-                        disabled={isListening || demoMidi <= MIN_DEMO_MIDI}
-                        onClick={() => moveDemoNote(-1)}
-                      >
-                        −
-                      </button>
-                      <output aria-live="polite">
-                        {activeMidi === null
-                          ? '—'
-                          : formatNoteLabel(
-                              midiToNote(activeMidi),
-                              displaySettings.middleCStyle,
-                            )}
-                      </output>
-                      <button
-                        type="button"
-                        aria-label="升高半音"
-                        disabled={isListening || demoMidi >= MAX_DEMO_MIDI}
-                        onClick={() => moveDemoNote(1)}
-                      >
-                        +
-                      </button>
-                    </div>
-                    <button
-                      type="button"
-                      className={
-                        'sticky-mode-button' +
-                        (stickyPitch ? ' is-selected' : '')
-                      }
-                      aria-pressed={stickyPitch}
-                      title="监听无新音高时保留最后识别音"
-                      onClick={() => setStickyPitch((current) => !current)}
-                    >
-                      <span aria-hidden="true" />
-                      粘滞
-                    </button>
-                  </div>
-                </div>
-              )
-            }
-            controls={
-              <div className="pitch-controls" aria-label="音高输入">
-                <div className="pitch-control-group input-mode-control">
-                  <span className="control-label">输入模式</span>
-                  <div className="input-mode-switch" aria-label="输入模式">
-                    <button
-                      type="button"
-                      className={
-                        learningMode === 'listen' ? 'is-selected' : ''
-                      }
-                      aria-pressed={learningMode === 'listen'}
-                      onClick={() => selectLearningMode('listen')}
-                    >
-                      监听
-                    </button>
-                    <button
-                      type="button"
-                      className={learningMode === 'play' ? 'is-selected' : ''}
-                      aria-pressed={learningMode === 'play'}
-                      onClick={() => selectLearningMode('play')}
-                    >
-                      弹奏
-                    </button>
-                  </div>
-                </div>
-                {learningMode === 'listen' ? (
-                  <div className="pitch-control-group microphone-control">
-                    <div className="microphone-heading">
-                      <span className="control-label">实时麦克风</span>
-                      <div
-                        className="compact-switch analysis-mode-switch"
-                        aria-label="识别模式"
-                      >
-                        <button
-                          type="button"
-                          className={
-                            listenAnalysisMode === 'single'
-                              ? 'is-selected'
-                              : ''
-                          }
-                          aria-pressed={listenAnalysisMode === 'single'}
-                          onClick={() => selectListenAnalysisMode('single')}
-                        >
-                          单音
-                        </button>
-                        <button
-                          type="button"
-                          className={
-                            listenAnalysisMode === 'polyphonic'
-                              ? 'is-selected'
-                              : ''
-                          }
-                          aria-pressed={listenAnalysisMode === 'polyphonic'}
-                          onClick={() =>
-                            selectListenAnalysisMode('polyphonic')
-                          }
-                        >
-                          多音
-                        </button>
-                      </div>
-                    </div>
-                    <button
-                      type="button"
-                      className={
-                        'mic-button' + (isListening ? ' is-live' : '')
-                      }
-                      disabled={microphoneDetection.status === 'requesting'}
-                      onClick={() => {
-                        if (isListening) {
-                          microphoneDetection.stop()
-                        } else {
-                          enableMicrophone()
-                        }
-                      }}
-                    >
-                      <span className="mic-icon" aria-hidden="true">
-                        {isListening ? '■' : '●'}
-                      </span>
-                      {microphoneDetection.status === 'requesting'
-                        ? '正在请求权限'
-                        : isListening
-                          ? '停止麦克风'
-                          : '启用麦克风'}
-                    </button>
-                  </div>
-                ) : (
-                  <MidiInputControl
-                    midi={midiInput}
-                    instrumentId={midiInstrumentId}
-                    onConnect={() => {
-                      void playback.prepare()
-                      void midiInput.connect()
-                    }}
-                    onSelectInput={midiInput.selectInput}
-                    onInstrumentChange={setMidiInstrumentId}
-                  />
-                )}
-              </div>
-            }
-          />
-        </section>
+          }}
+          onMoveDemoNote={moveDemoNote}
+          onToggleStickyPitch={() => setStickyPitch((current) => !current)}
+          onMidiConnect={() => {
+            void playback.prepare()
+            void midiInput.connect()
+          }}
+          onMidiInstrumentChange={(instrumentId) =>
+            setPreference('midiInstrumentId', instrumentId)
+          }
+        />
 
         {audioErrorMessage ? (
           <div className="error-banner" role="alert">
@@ -816,292 +488,83 @@ function App() {
           </div>
         ) : null}
 
-        <section className="visual-card fretboard-card">
-          <div
-            className={
-              'card-heading fretboard-heading' +
-              (practiceStringMode ? ' has-practice-string' : '')
-            }
-          >
-            <div className="fretboard-title">
-              <p className="card-kicker">Fretboard</p>
-              <h2>吉他指板</h2>
-            </div>
-            <div className="fretboard-controls">
-              {practiceStringMode ? (
-                <div className="fretboard-string-control">
-                  <span className="control-label">练习弦</span>
-                  <div className="string-buttons">
-                    {STANDARD_TUNING.map((guitarString) => {
-                      const note = midiToNote(guitarString.openMidi)
-                      const isSelected =
-                        preferredString === guitarString.stringNumber
-
-                      return (
-                        <button
-                          type="button"
-                          key={guitarString.stringNumber}
-                          className={
-                            'string-button' +
-                            (isSelected ? ' is-selected' : '')
-                          }
-                          aria-pressed={isSelected}
-                          onClick={() =>
-                            setPreferredString(guitarString.stringNumber)
-                          }
-                        >
-                          <strong>{guitarString.stringNumber}</strong>
-                          <small>
-                            {formatNoteLabel(
-                              note,
-                              displaySettings.middleCStyle,
-                            )}
-                          </small>
-                        </button>
-                      )
-                    })}
-                  </div>
-                </div>
-              ) : null}
-
-              <div className="fretboard-display-control">
-                <span className="control-label">辅助显示</span>
-                <div className="fretboard-toggle-list">
-                  <button
-                    type="button"
-                    className={
-                      'toggle-button' +
-                      (practiceStringMode ? ' is-selected' : '')
-                    }
-                    aria-label="练习弦模式"
-                    aria-pressed={practiceStringMode}
-                    onClick={() =>
-                      setPracticeStringMode((current) => !current)
-                    }
-                  >
-                    <span className="toggle-indicator" />
-                    <span className="toggle-label-long" aria-hidden="true">
-                      练习弦模式
-                    </span>
-                    <span className="toggle-label-short" aria-hidden="true">
-                      练习弦
-                    </span>
-                  </button>
-                  <button
-                    type="button"
-                    className={
-                      'toggle-button' +
-                      (showPitchClass ? ' is-selected' : '')
-                    }
-                    aria-label="同音名其他八度"
-                    aria-pressed={showPitchClass}
-                    onClick={() => setShowPitchClass((current) => !current)}
-                  >
-                    <span className="toggle-indicator" />
-                    <span className="toggle-label-long" aria-hidden="true">
-                      同音名其他八度
-                    </span>
-                    <span className="toggle-label-short" aria-hidden="true">
-                      其他八度
-                    </span>
-                  </button>
-                </div>
-              </div>
-
-              <div className="legend" aria-label="指板音高图例">
-                {practiceStringMode ? (
-                  <>
-                    <span>
-                      <i className="legend-primary" />
-                      <span className="legend-label-long">
-                        练习弦 · 当前音高
-                      </span>
-                      <span className="legend-label-short">练习弦音高</span>
-                    </span>
-                    <span>
-                      <i className="legend-secondary" />
-                      <span className="legend-label-long">
-                        其他弦 · 同音高
-                      </span>
-                      <span className="legend-label-short">其他弦同音</span>
-                    </span>
-                  </>
-                ) : (
-                  <span>
-                    <i className="legend-equal" />
-                    <span className="legend-label-long">
-                      {learningMode === 'play'
-                        ? '弹奏音 · 全部位置'
-                        : '当前音高 · 全部位置'}
-                    </span>
-                    <span className="legend-label-short">
-                      {learningMode === 'play' ? '弹奏音' : '当前音高'}
-                    </span>
-                  </span>
-                )}
-                {showPitchClass ? (
-                  <span>
-                    <i className="legend-octave" />
-                    <span className="legend-label-long">
-                      同音名 · 其他八度
-                    </span>
-                    <span className="legend-label-short">其他八度</span>
-                  </span>
-                ) : null}
-              </div>
-
-              {learningMode === 'play' ? (
-                <GestureModeSwitch
-                  className="fretboard-gesture-control"
-                  label="指板手势"
-                  mode={fretboardGestureMode}
-                  onChange={setFretboardGestureMode}
-                />
-              ) : null}
-            </div>
-          </div>
-          <div className="fretboard-scroll">
-            <FretboardSvg
-              midi={activeMidi}
-              middleCStyle={displaySettings.middleCStyle}
-              midis={displayMidis}
-              activeMidis={soundingMidis}
-              releasingMidis={playSession.releasingMidis}
-              playedPositions={playedPositions}
-              preferredString={preferredString}
-              highlightPracticeString={practiceStringMode}
-              showPitchClass={showPitchClass}
-              playable={learningMode === 'play'}
-              interactive={learningMode === 'play' || canInvitePlayMode}
-              glissandoEnabled={
-                learningMode === 'play' &&
-                fretboardGestureMode === 'glissando'
-              }
-              onSelectString={setPreferredString}
-              onPlayPosition={(position) =>
-                playNote({
-                  midi: position.midi,
-                  instrumentId: 'guitar',
-                  source: 'fretboard',
-                  stringNumber: position.stringNumber,
-                  fret: position.fret,
-                })
-              }
-              onStartPosition={(pointerId, position) =>
-                startPlayVoice('fretboard:' + pointerId, {
-                  midi: position.midi,
-                  instrumentId: 'guitar',
-                  source: 'fretboard',
-                  stringNumber: position.stringNumber,
-                  fret: position.fret,
-                })
-              }
-              onEndPosition={(pointerId) =>
-                stopPlayVoice('fretboard:' + pointerId)
-              }
-            />
-          </div>
-        </section>
+        <FretboardPanel
+          learningMode={learningMode}
+          canInvitePlayMode={canInvitePlayMode}
+          activeMidi={activeMidi}
+          middleCStyle={displaySettings.middleCStyle}
+          displayMidis={displayMidis}
+          soundingMidis={soundingMidis}
+          releasingMidis={playSession.releasingMidis}
+          playedPositions={playedPositions}
+          preferredString={preferredString}
+          practiceStringMode={practiceStringMode}
+          showPitchClass={showPitchClass}
+          gestureMode={fretboardGestureMode}
+          onSelectString={setPreferredString}
+          onTogglePracticeStringMode={() =>
+            setPreference('practiceStringMode', !practiceStringMode)
+          }
+          onToggleShowPitchClass={() =>
+            setShowPitchClass((current) => !current)
+          }
+          onGestureModeChange={setFretboardGestureMode}
+          onPlayPosition={(position) =>
+            playNote({
+              midi: position.midi,
+              instrumentId: 'guitar',
+              source: 'fretboard',
+              stringNumber: position.stringNumber,
+              fret: position.fret,
+            })
+          }
+          onStartPosition={(pointerId, position) =>
+            startPlayVoice('fretboard:' + pointerId, {
+              midi: position.midi,
+              instrumentId: 'guitar',
+              source: 'fretboard',
+              stringNumber: position.stringNumber,
+              fret: position.fret,
+            })
+          }
+          onEndPosition={(pointerId) =>
+            stopPlayVoice('fretboard:' + pointerId)
+          }
+        />
 
         <section className="secondary-grid">
-          <article className="visual-card piano-card">
-            <div className="card-heading piano-heading">
-              <div className="piano-title">
-                <p className="card-kicker">Keyboard</p>
-                <h2>钢琴键盘</h2>
-              </div>
-              {learningMode === 'play' ? (
-                <GestureModeSwitch
-                  className="piano-gesture-control"
-                  label="键盘手势"
-                  mode={pianoGestureMode}
-                  onChange={setPianoGestureMode}
-                />
-              ) : null}
-              <span className="card-note piano-range-note">
-                {formatNoteLabel(
-                  midiToNote(36),
-                  displaySettings.middleCStyle,
-                )}{' '}
-                —{' '}
-                {formatNoteLabel(
-                  midiToNote(96),
-                  displaySettings.middleCStyle,
-                )}
-              </span>
-            </div>
-            <div className="piano-scroll">
-              <PianoKeyboard
-                midi={activeMidi}
-                middleCStyle={displaySettings.middleCStyle}
-                midis={displayMidis}
-                activeMidis={soundingMidis}
-                releasingMidis={playSession.releasingMidis}
-                showPitchClass={showPitchClass}
-                playable={learningMode === 'play'}
-                interactive={learningMode === 'play' || canInvitePlayMode}
-                glissandoEnabled={
-                  learningMode === 'play' &&
-                  pianoGestureMode === 'glissando'
-                }
-                onPlayKey={(midi) =>
-                  playNote({
-                    midi,
-                    instrumentId: 'piano',
-                    source: 'piano',
-                  })
-                }
-                onStartKey={(pointerId, midi) =>
-                  startPlayVoice('piano:' + pointerId, {
-                    midi,
-                    instrumentId: 'piano',
-                    source: 'piano',
-                  })
-                }
-                onEndKey={(pointerId) =>
-                  stopPlayVoice('piano:' + pointerId)
-                }
-              />
-            </div>
-          </article>
-
-          <article className="visual-card staff-card">
-            <div className="card-heading">
-              <div>
-                <p className="card-kicker">Notation</p>
-                <h2>五线谱</h2>
-              </div>
-              <div
-                className="compact-switch notation-mode-switch"
-                aria-label="记谱模式"
-              >
-                <button
-                  type="button"
-                  className={notationMode === 'guitar' ? 'is-selected' : ''}
-                  aria-pressed={notationMode === 'guitar'}
-                  onClick={() => setNotationMode('guitar')}
-                >
-                  吉他记谱
-                </button>
-                <button
-                  type="button"
-                  className={notationMode === 'concert' ? 'is-selected' : ''}
-                  aria-pressed={notationMode === 'concert'}
-                  onClick={() => setNotationMode('concert')}
-                >
-                  实际音高
-                </button>
-              </div>
-            </div>
-            <StaffView
-              midi={activeMidi}
-              middleCStyle={displaySettings.middleCStyle}
-              midis={displayMidis}
-              activeMidis={soundingMidis}
-              releasingMidis={playSession.releasingMidis}
-              mode={notationMode}
-            />
-          </article>
+          <KeyboardPanel
+            learningMode={learningMode}
+            canInvitePlayMode={canInvitePlayMode}
+            activeMidi={activeMidi}
+            middleCStyle={displaySettings.middleCStyle}
+            displayMidis={displayMidis}
+            soundingMidis={soundingMidis}
+            releasingMidis={playSession.releasingMidis}
+            showPitchClass={showPitchClass}
+            gestureMode={pianoGestureMode}
+            onGestureModeChange={setPianoGestureMode}
+            onPlayKey={(midi) =>
+              playNote({ midi, instrumentId: 'piano', source: 'piano' })
+            }
+            onStartKey={(pointerId, midi) =>
+              startPlayVoice('piano:' + pointerId, {
+                midi,
+                instrumentId: 'piano',
+                source: 'piano',
+              })
+            }
+            onEndKey={(pointerId) => stopPlayVoice('piano:' + pointerId)}
+          />
+          <NotationPanel
+            activeMidi={activeMidi}
+            middleCStyle={displaySettings.middleCStyle}
+            displayMidis={displayMidis}
+            soundingMidis={soundingMidis}
+            releasingMidis={playSession.releasingMidis}
+            mode={notationMode}
+            onModeChange={setNotationMode}
+          />
         </section>
       </main>
     </div>
@@ -1109,45 +572,6 @@ function App() {
 }
 
 export default App
-
-interface GestureModeSwitchProps {
-  className?: string
-  label: string
-  mode: PlayGestureMode
-  onChange: (mode: PlayGestureMode) => void
-}
-
-function GestureModeSwitch({
-  className = '',
-  label,
-  mode,
-  onChange,
-}: GestureModeSwitchProps) {
-  return (
-    <div className={'compact-switch-control ' + className}>
-      <div className="compact-switch" aria-label={label}>
-        <button
-          type="button"
-          className={mode === 'scroll' ? 'is-selected' : ''}
-          aria-pressed={mode === 'scroll'}
-          title="拖动时横向滚动，点击仍可发声"
-          onClick={() => onChange('scroll')}
-        >
-          滚动
-        </button>
-        <button
-          type="button"
-          className={mode === 'glissando' ? 'is-selected' : ''}
-          aria-pressed={mode === 'glissando'}
-          title="按住或多指拖过品位、琴键时连续发声"
-          onClick={() => onChange('glissando')}
-        >
-          滑奏
-        </button>
-      </div>
-    </div>
-  )
-}
 
 function initialPlayGestureMode(): PlayGestureMode {
   return window.matchMedia('(max-width: 900px)').matches
@@ -1168,22 +592,6 @@ function formatNoteSummary(
     .map((midi) => formatNoteLabel(midiToNote(midi), middleCStyle))
   const remaining = midis.length - visible.length
   return visible.join(' · ') + (remaining > 0 ? '  +' + remaining : '')
-}
-
-function formatNoteFrequencySummary(
-  midis: readonly number[],
-  middleCStyle: MiddleCStyle,
-): string {
-  return midis
-    .slice(0, 4)
-    .map(
-      (midi) =>
-        formatNoteLabel(midiToNote(midi), middleCStyle) +
-        ' ' +
-        midiToFrequency(midi).toFixed(1) +
-        'Hz',
-    )
-    .join(' · ')
 }
 
 function createStandardPitchReading(midi: number): PitchReading {
@@ -1239,58 +647,4 @@ function resolveSourceLabel({
   }
 
   return fallback
-}
-
-function loadListenAnalysisMode(): ListenAnalysisMode {
-  try {
-    return window.localStorage.getItem(LISTEN_ANALYSIS_MODE_STORAGE_KEY) ===
-      'polyphonic'
-      ? 'polyphonic'
-      : 'single'
-  } catch {
-    return 'single'
-  }
-}
-
-function saveListenAnalysisMode(mode: ListenAnalysisMode): void {
-  try {
-    window.localStorage.setItem(LISTEN_ANALYSIS_MODE_STORAGE_KEY, mode)
-  } catch {
-    // Storage can be unavailable in private or restricted browser contexts.
-  }
-}
-
-function loadPersistentBoolean(key: string, fallback: boolean): boolean {
-  try {
-    const stored = window.localStorage.getItem(key)
-    return stored === null ? fallback : stored === 'true'
-  } catch {
-    return fallback
-  }
-}
-
-function savePersistentBoolean(key: string, value: boolean): void {
-  try {
-    window.localStorage.setItem(key, String(value))
-  } catch {
-    // Storage can be unavailable in private or restricted browser contexts.
-  }
-}
-
-function loadMidiInstrument(): InstrumentId {
-  try {
-    return window.localStorage.getItem(MIDI_INSTRUMENT_STORAGE_KEY) === 'guitar'
-      ? 'guitar'
-      : 'piano'
-  } catch {
-    return 'piano'
-  }
-}
-
-function saveMidiInstrument(instrumentId: InstrumentId): void {
-  try {
-    window.localStorage.setItem(MIDI_INSTRUMENT_STORAGE_KEY, instrumentId)
-  } catch {
-    // Storage can be unavailable in private or restricted browser contexts.
-  }
 }

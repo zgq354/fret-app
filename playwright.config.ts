@@ -14,7 +14,7 @@ export default defineConfig({
     },
   ],
   reporter: [['list']],
-  testDir: 'e2e',
+  testDir: 'tests/e2e',
   testMatch: '**/*.e2e.ts',
   timeout: 30_000,
   use: {
