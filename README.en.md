@@ -34,7 +34,7 @@ After the first online visit, the app prepares a complete offline release in the
 
 ## Technology and verification
 
-Fret & Key is a static web app built with React, TypeScript, the Web Audio API, and data-driven SVG. Polyphonic transcription uses Spotify’s browser implementation of [Basic Pitch](https://github.com/spotify/basic-pitch-ts), and chord candidates use [Tonal](https://github.com/tonaljs/tonal). Offline releases use [`@fullstack-webapp/local-edge`](https://www.npmjs.com/package/@fullstack-webapp/local-edge) for browser-side atomic updates and recovery boundaries.
+Fret & Key is a static web app built with React, TypeScript, the Web Audio API, and data-driven SVG. Polyphonic transcription uses Spotify’s browser implementation of [Basic Pitch](https://github.com/spotify/basic-pitch-ts), and chord candidates use [Tonal](https://github.com/tonaljs/tonal). Offline releases use [`@fullstack-webapp/local-edge`](https://www.npmjs.com/package/@fullstack-webapp/local-edge) for browser-side atomic updates and recovery boundaries. See the [architecture](docs/architecture.md) for module ownership, input-to-display flow, and the production release boundary.
 
 The public CI runs linting, type checking, unit tests, Local Edge browser tests, and a production build:
 

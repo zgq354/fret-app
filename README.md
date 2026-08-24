@@ -34,7 +34,7 @@
 
 ## 技术与验证
 
-弦音地图是纯静态 Web 应用，使用 React、TypeScript、Web Audio API 和数据驱动 SVG。多音转录使用 Spotify 的 [Basic Pitch](https://github.com/spotify/basic-pitch-ts) 浏览器实现，和弦候选使用 [Tonal](https://github.com/tonaljs/tonal)。离线 release 由 [`@fullstack-webapp/local-edge`](https://www.npmjs.com/package/@fullstack-webapp/local-edge) 提供浏览器侧的原子更新与恢复边界。
+弦音地图是纯静态 Web 应用，使用 React、TypeScript、Web Audio API 和数据驱动 SVG。多音转录使用 Spotify 的 [Basic Pitch](https://github.com/spotify/basic-pitch-ts) 浏览器实现，和弦候选使用 [Tonal](https://github.com/tonaljs/tonal)。离线 release 由 [`@fullstack-webapp/local-edge`](https://www.npmjs.com/package/@fullstack-webapp/local-edge) 提供浏览器侧的原子更新与恢复边界。模块分工、输入到显示的路径与生产发布边界见[技术架构](docs/architecture.md)。
 
 公开 CI 会运行 lint、类型检查、单元测试、Local Edge 浏览器测试和生产构建：
 
