@@ -1,4 +1,4 @@
-import type { MicrophoneDetectionStatus } from '../audio/microphoneInput'
+import type { MicrophoneDetectionStatus } from '../modules/audio/microphoneInput'
 import {
   createPitchReading,
   formatNoteLabel,
@@ -6,7 +6,7 @@ import {
   midiToNote,
   type MiddleCStyle,
   type PitchReading,
-} from '../music/musicTheory'
+} from '../modules/music/musicTheory'
 import type { PlayNoteRequest } from './playSession'
 export type { PlayNoteRequest } from './playSession'
 export type LearningMode = 'listen' | 'play'

@@ -1,17 +1,17 @@
 import { MidiInputControl } from '../MidiInputControl/MidiInputControl'
 import { PitchMeter } from '../PitchMeter/PitchMeter'
-import type { PolyphonicFeedback } from '../../audio/polyphonicFeedback'
-import type { PolyphonicAnalysisState } from '../../audio/polyphonicInferenceMessages'
-import type { ChordReading } from '../../music/chordAnalysis'
+import type { PolyphonicFeedback } from '../../modules/audio/polyphonicFeedback'
+import type { PolyphonicAnalysisState } from '../../modules/audio/polyphonicInferenceMessages'
+import type { ChordReading } from '../../modules/music/chordAnalysis'
 import {
   formatNoteLabel,
   midiToFrequency,
   midiToNote,
   type MiddleCStyle,
   type PitchReading,
-} from '../../music/musicTheory'
-import type { MidiInputState } from '../../midi/react/useMidiInput'
-import type { InstrumentId } from '../../playback/instrument'
+} from '../../modules/music/musicTheory'
+import type { MidiInputState } from '../../modules/midi/react/useMidiInput'
+import type { InstrumentId } from '../../modules/playback/instrument'
 import type { LearningMode } from '../../learning/playMode'
 import type { ListenAnalysisMode } from '../../learning/listenAnalysisMode'
 

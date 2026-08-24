@@ -1,4 +1,4 @@
-import type { ListenAnalysisMode } from '../learning/listenAnalysisMode'
+import type { ListenAnalysisMode } from '../../learning/listenAnalysisMode'
 import type { InstrumentId } from '../playback/instrument'
 
 export interface AppPreferences {

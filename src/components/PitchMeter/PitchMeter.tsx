@@ -5,7 +5,7 @@ import {
   formatNoteOctave,
   type MiddleCStyle,
   type PitchReading,
-} from '../../music/musicTheory'
+} from '../../modules/music/musicTheory'
 
 interface PitchMeterProps {
   reading: PitchReading | null

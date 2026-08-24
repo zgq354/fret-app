@@ -1,5 +1,5 @@
 import { StaffView, type StaffNotationMode } from '../StaffView/StaffView'
-import type { MiddleCStyle } from '../../music/musicTheory'
+import type { MiddleCStyle } from '../../modules/music/musicTheory'
 
 interface NotationPanelProps {
   activeMidi: number | null

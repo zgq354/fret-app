@@ -1,5 +1,5 @@
 import { useEffect, useReducer, useRef, useState } from 'react'
-import { VOICE_RELEASE_MS } from '../../playback/instrument'
+import { VOICE_RELEASE_MS } from '../../modules/playback/instrument'
 import {
   EMPTY_PLAY_SESSION,
   getActivePlayNotes,

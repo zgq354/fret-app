@@ -1,5 +1,5 @@
-import type { InstrumentId } from '../../playback/instrument'
-import type { MidiSessionState } from '../../midi/midiSession'
+import type { InstrumentId } from '../../modules/playback/instrument'
+import type { MidiSessionState } from '../../modules/midi/midiSession'
 import './MidiInputControl.css'
 
 interface MidiInputControlProps {

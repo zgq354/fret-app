@@ -4,12 +4,12 @@ import {
   type PlayGestureMode,
 } from '../GestureModeSwitch/GestureModeSwitch'
 import type { LearningMode } from '../../learning/playMode'
-import { STANDARD_TUNING, type FretPosition } from '../../music/fretboard'
+import { STANDARD_TUNING, type FretPosition } from '../../modules/music/fretboard'
 import {
   formatNoteLabel,
   midiToNote,
   type MiddleCStyle,
-} from '../../music/musicTheory'
+} from '../../modules/music/musicTheory'
 
 interface FretboardPanelProps {
   learningMode: LearningMode

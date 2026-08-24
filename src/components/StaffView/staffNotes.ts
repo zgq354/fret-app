@@ -1,4 +1,4 @@
-import { midiToNote, type NoteInfo } from '../../music/musicTheory'
+import { midiToNote, type NoteInfo } from '../../modules/music/musicTheory'
 
 export type StaffNotationMode = 'guitar' | 'concert'
 

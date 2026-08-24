@@ -5,12 +5,12 @@ import {
   findPitchClassPositions,
   STANDARD_MARKERS,
   type FretPosition,
-} from '../../music/fretboard'
+} from '../../modules/music/fretboard'
 import {
   formatNoteLabel,
   midiToNote,
   type MiddleCStyle,
-} from '../../music/musicTheory'
+} from '../../modules/music/musicTheory'
 import { FretboardPlayTargets } from './FretboardPlayTargets'
 import {
   BOARD_BOTTOM,

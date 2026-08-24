@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   createPitchReading,
   MiddleCStyle,
-} from '../../src/music/musicTheory'
+} from '../../src/modules/music/musicTheory'
 import { canPromptPlayMode, resolveLearningDisplay } from '../../src/learning/playMode'
 
 const baseInput = {

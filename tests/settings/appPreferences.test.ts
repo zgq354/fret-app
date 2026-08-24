@@ -6,7 +6,7 @@ import {
   PracticeModeStorageKey,
   loadAppPreferences,
   saveAppPreferences,
-} from '../../src/settings/appPreferences'
+} from '../../src/modules/settings/appPreferences'
 
 describe('app preferences', () => {
   it('uses stable defaults without browser storage', () => {

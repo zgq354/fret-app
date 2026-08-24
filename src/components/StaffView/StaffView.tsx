@@ -5,7 +5,7 @@ import {
 import {
   formatNoteLabel,
   type MiddleCStyle,
-} from '../../music/musicTheory'
+} from '../../modules/music/musicTheory'
 export type { StaffNotationMode } from './staffNotes'
 
 interface StaffViewProps {

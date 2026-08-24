@@ -11,15 +11,15 @@ import {
   type AudioSettings,
   type PreferredChannelCount,
   type PreferredSampleRate,
-} from '../../audio/audioSettings'
-import { sensitivityToSilenceThreshold } from '../../audio/detectPitch'
-import type { PolyphonicModelState } from '../../audio/polyphonicInferenceMessages'
-import { MiddleCStyle } from '../../music/musicTheory'
+} from '../../modules/audio/audioSettings'
+import { sensitivityToSilenceThreshold } from '../../modules/audio/detectPitch'
+import type { PolyphonicModelState } from '../../modules/audio/polyphonicInferenceMessages'
+import { MiddleCStyle } from '../../modules/music/musicTheory'
 import {
   areDefaultDisplaySettings,
   DefaultDisplaySettings,
   type DisplaySettings,
-} from '../../settings/displaySettings'
+} from '../../modules/settings/displaySettings'
 import {
   formatFwaReleaseId,
   type FwaUpdateState,

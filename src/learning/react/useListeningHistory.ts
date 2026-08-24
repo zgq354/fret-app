@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import type { ChordReading } from '../../music/chordAnalysis'
-import type { PitchReading } from '../../music/musicTheory'
+import type { ChordReading } from '../../modules/music/chordAnalysis'
+import type { PitchReading } from '../../modules/music/musicTheory'
 import type { ListenAnalysisMode } from '../listenAnalysisMode'
 
 export interface ListeningHistory {

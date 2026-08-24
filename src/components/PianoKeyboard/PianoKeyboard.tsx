@@ -10,9 +10,9 @@ import {
   formatNoteLabel,
   midiToNote,
   type MiddleCStyle,
-} from '../../music/musicTheory'
-import { resolveGlissandoTarget } from '../../playback/pointerGlissando'
-import { usePointerGlissando } from '../../playback/react/usePointerGlissando'
+} from '../../modules/music/musicTheory'
+import { resolveGlissandoTarget } from '../../modules/playback/pointerGlissando'
+import { usePointerGlissando } from '../../modules/playback/react/usePointerGlissando'
 import {
   BLACK_KEY_WIDTH,
   createPianoKeys,

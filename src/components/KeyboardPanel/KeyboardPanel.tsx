@@ -8,7 +8,7 @@ import {
   formatNoteLabel,
   midiToNote,
   type MiddleCStyle,
-} from '../../music/musicTheory'
+} from '../../modules/music/musicTheory'
 
 interface KeyboardPanelProps {
   learningMode: LearningMode

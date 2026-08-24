@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest'
-import { createPitchReading } from '../../src/music/musicTheory'
+import { createPitchReading } from '../../src/modules/music/musicTheory'
 import {
   detectPitch,
   sensitivityToSilenceThreshold,
-} from '../../src/audio/detectPitch'
+} from '../../src/modules/audio/detectPitch'
 
 const SAMPLE_RATE = 48_000
 const BUFFER_SIZE = 4_096

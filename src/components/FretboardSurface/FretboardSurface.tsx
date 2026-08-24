@@ -1,8 +1,8 @@
 import { FretboardSvg } from '../FretboardSvg/FretboardSvg'
 import type { PlayGestureMode } from '../GestureModeSwitch/GestureModeSwitch'
 import type { LearningMode } from '../../learning/playMode'
-import type { FretPosition } from '../../music/fretboard'
-import type { MiddleCStyle } from '../../music/musicTheory'
+import type { FretPosition } from '../../modules/music/fretboard'
+import type { MiddleCStyle } from '../../modules/music/musicTheory'
 
 interface FretboardSurfaceProps {
   learningMode: LearningMode

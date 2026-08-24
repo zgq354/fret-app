@@ -3,7 +3,7 @@ import {
   fretCenterRatio,
   fretLineRatio,
   STANDARD_TUNING,
-} from '../../music/fretboard'
+} from '../../modules/music/fretboard'
 
 export const FRETBOARD_WIDTH = 1_280
 export const FRETBOARD_HEIGHT = 238

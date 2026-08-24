@@ -1,17 +1,17 @@
 import { useMemo, useRef, useState, type CSSProperties } from 'react'
 import './App.css'
-import { useAudioSettings } from './audio/react/useAudioSettings'
-import { usePitchDetection } from './audio/react/usePitchDetection'
-import { usePolyphonicPitchDetection } from './audio/react/usePolyphonicPitchDetection'
+import { useAudioSettings } from './modules/audio/react/useAudioSettings'
+import { usePitchDetection } from './modules/audio/react/usePitchDetection'
+import { usePolyphonicPitchDetection } from './modules/audio/react/usePolyphonicPitchDetection'
 import { FretboardPanel } from './components/FretboardPanel/FretboardPanel'
 import { KeyboardPanel } from './components/KeyboardPanel/KeyboardPanel'
 import { LearningPanel } from './components/LearningPanel/LearningPanel'
 import { NotationPanel } from './components/NotationPanel/NotationPanel'
-import { resolvePolyphonicFeedback } from './audio/polyphonicFeedback'
+import { resolvePolyphonicFeedback } from './modules/audio/polyphonicFeedback'
 import type {
   PolyphonicAnalysisState,
   PolyphonicModelState,
-} from './audio/polyphonicInferenceMessages'
+} from './modules/audio/polyphonicInferenceMessages'
 import { EntryDialog } from './components/EntryDialog/EntryDialog'
 import type { PlayGestureMode } from './components/GestureModeSwitch/GestureModeSwitch'
 import { TechnicalSettingsDialog } from './components/TechnicalSettings/TechnicalSettingsDialog'
@@ -25,8 +25,8 @@ import type { ListenAnalysisMode } from './learning/listenAnalysisMode'
 import type { PlayNoteRequest } from './learning/playSession'
 import { useListeningHistory } from './learning/react/useListeningHistory'
 import { usePlaySession } from './learning/react/usePlaySession'
-import { getFretPosition } from './music/fretboard'
-import type { ChordReading } from './music/chordAnalysis'
+import { getFretPosition } from './modules/music/fretboard'
+import type { ChordReading } from './modules/music/chordAnalysis'
 import {
   createPitchReading,
   formatNoteLabel,
@@ -35,16 +35,16 @@ import {
   midiToFrequency,
   type MiddleCStyle,
   type PitchReading,
-} from './music/musicTheory'
-import { useMidiInput } from './midi/react/useMidiInput'
-import { VOICE_RELEASE_MS } from './playback/instrument'
-import { usePlayback } from './playback/react/usePlayback'
+} from './modules/music/musicTheory'
+import { useMidiInput } from './modules/midi/react/useMidiInput'
+import { VOICE_RELEASE_MS } from './modules/playback/instrument'
+import { usePlayback } from './modules/playback/react/usePlayback'
 import { setFwaDebugEnabled } from './platform/fwa-debug-state/fwa-debug-state'
 import { useFwaDebugState } from './platform/fwa-debug-state/react/useFwaDebugState'
 import { applyFwaUpdate } from './platform/fwa-update/fwa-update'
 import { useFwaUpdateState } from './platform/fwa-update/react/useFwaUpdateState'
-import { useDisplaySettings } from './settings/react/useDisplaySettings'
-import { useAppPreferences } from './settings/react/useAppPreferences'
+import { useDisplaySettings } from './modules/settings/react/useDisplaySettings'
+import { useAppPreferences } from './modules/settings/react/useAppPreferences'
 
 const MIN_DEMO_MIDI = 40
 const MAX_DEMO_MIDI = 88
