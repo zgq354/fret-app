@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
+import { useMemo, useRef, useState, type CSSProperties } from 'react'
 import './App.css'
 import { useAudioSettings } from './audio/react/useAudioSettings'
 import { usePitchDetection } from './audio/usePitchDetection'
@@ -33,6 +33,7 @@ import {
   type PlayNoteRequest,
 } from './learning/playSession'
 import { usePlaySession } from './learning/usePlaySession'
+import { useListeningHistory } from './learning/react/useListeningHistory'
 import { getFretPosition, STANDARD_TUNING } from './music/fretboard'
 import type { ChordReading } from './music/chordAnalysis'
 import {
@@ -80,10 +81,6 @@ function App() {
   const fwaDebugState = useFwaDebugState()
   const fwaUpdateState = useFwaUpdateState()
   const [stickyPitch, setStickyPitch] = useState(false)
-  const [latestDetectedReading, setLatestDetectedReading] =
-    useState<PitchReading | null>(null)
-  const [latestDetectedChord, setLatestDetectedChord] =
-    useState<ChordReading | null>(null)
   const [learningMode, setLearningMode] = useState<LearningMode>('listen')
   const [playModeInviteOpen, setPlayModeInviteOpen] = useState(false)
   const [technicalSettingsOpen, setTechnicalSettingsOpen] = useState(false)
@@ -124,6 +121,17 @@ function App() {
     learningMode === 'listen' && microphoneDetection.status === 'listening'
   const isPolyphonicListening =
     isListening && listenAnalysisMode === 'polyphonic'
+
+  const {
+    latestDetectedReading,
+    latestDetectedChord,
+    clear: clearListeningHistory,
+  } = useListeningHistory({
+    isListening,
+    mode: listenAnalysisMode,
+    pitchReading: singlePitchDetection.reading,
+    chordReading: polyphonicPitchDetection.reading,
+  })
   const learningDisplay = useMemo(
     () =>
       resolveLearningDisplay({
@@ -227,17 +235,6 @@ function App() {
     microphoneDetection.status,
   )
 
-  useEffect(() => {
-    if (isListening && singlePitchDetection.reading) {
-      setLatestDetectedReading(singlePitchDetection.reading)
-    }
-  }, [isListening, singlePitchDetection.reading])
-
-  useEffect(() => {
-    if (isListening && polyphonicPitchDetection.reading) {
-      setLatestDetectedChord(polyphonicPitchDetection.reading)
-    }
-  }, [isListening, polyphonicPitchDetection.reading])
 
   const updateFwaDebugEnabled = (enabled: boolean) => {
     setFwaDebugEnabled(enabled)
@@ -262,8 +259,7 @@ function App() {
     if (mode === 'play') {
       singlePitchDetection.stop()
       polyphonicPitchDetection.dispose()
-      setLatestDetectedReading(null)
-      setLatestDetectedChord(null)
+      clearListeningHistory()
     } else {
       playback.stopAll()
     }
@@ -278,14 +274,12 @@ function App() {
 
     singlePitchDetection.stop()
     polyphonicPitchDetection.dispose()
-    setLatestDetectedReading(null)
-    setLatestDetectedChord(null)
+    clearListeningHistory()
     setPreference('listenAnalysisMode', mode)
   }
 
   const enableMicrophone = () => {
-    setLatestDetectedReading(null)
-    setLatestDetectedChord(null)
+    clearListeningHistory()
     void microphoneDetection.start()
   }
 
