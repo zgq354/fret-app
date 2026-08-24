@@ -3,13 +3,9 @@ import './App.css'
 import { useAudioSettings } from './audio/react/useAudioSettings'
 import { usePitchDetection } from './audio/usePitchDetection'
 import { usePolyphonicPitchDetection } from './audio/usePolyphonicPitchDetection'
-import {
-  FretboardSurface,
-} from './components/FretboardSurface/FretboardSurface'
+import { FretboardPanel } from './components/FretboardPanel/FretboardPanel'
 import { KeyboardPanel } from './components/KeyboardPanel/KeyboardPanel'
-import {
-  LearningPanel,
-} from './components/LearningPanel/LearningPanel'
+import { LearningPanel } from './components/LearningPanel/LearningPanel'
 import { NotationPanel } from './components/NotationPanel/NotationPanel'
 import { resolvePolyphonicFeedback } from './audio/polyphonicFeedback'
 import type {
@@ -17,24 +13,19 @@ import type {
   PolyphonicModelState,
 } from './audio/polyphonicInferenceMessages'
 import { EntryDialog } from './components/EntryDialog/EntryDialog'
-import {
-  GestureModeSwitch,
-  type PlayGestureMode,
-} from './components/GestureModeSwitch/GestureModeSwitch'
+import type { PlayGestureMode } from './components/GestureModeSwitch/GestureModeSwitch'
 import { TechnicalSettingsDialog } from './components/TechnicalSettings/TechnicalSettingsDialog'
-import { type StaffNotationMode } from './components/StaffView/StaffView'
+import type { StaffNotationMode } from './components/StaffView/StaffView'
 import {
   canPromptPlayMode,
   resolveLearningDisplay,
   type LearningMode,
 } from './learning/playMode'
 import type { ListenAnalysisMode } from './learning/listenAnalysisMode'
-import {
-  type PlayNoteRequest,
-} from './learning/playSession'
-import { usePlaySession } from './learning/usePlaySession'
+import type { PlayNoteRequest } from './learning/playSession'
 import { useListeningHistory } from './learning/react/useListeningHistory'
-import { getFretPosition, STANDARD_TUNING } from './music/fretboard'
+import { usePlaySession } from './learning/usePlaySession'
+import { getFretPosition } from './music/fretboard'
 import type { ChordReading } from './music/chordAnalysis'
 import {
   createPitchReading,
@@ -497,190 +488,49 @@ function App() {
           </div>
         ) : null}
 
-        <section className="visual-card fretboard-card">
-          <div
-            className={
-              'card-heading fretboard-heading' +
-              (practiceStringMode ? ' has-practice-string' : '')
-            }
-          >
-            <div className="fretboard-title">
-              <p className="card-kicker">Fretboard</p>
-              <h2>吉他指板</h2>
-            </div>
-            <div className="fretboard-controls">
-              {practiceStringMode ? (
-                <div className="fretboard-string-control">
-                  <span className="control-label">练习弦</span>
-                  <div className="string-buttons">
-                    {STANDARD_TUNING.map((guitarString) => {
-                      const note = midiToNote(guitarString.openMidi)
-                      const isSelected =
-                        preferredString === guitarString.stringNumber
-
-                      return (
-                        <button
-                          type="button"
-                          key={guitarString.stringNumber}
-                          className={
-                            'string-button' +
-                            (isSelected ? ' is-selected' : '')
-                          }
-                          aria-pressed={isSelected}
-                          onClick={() =>
-                            setPreferredString(guitarString.stringNumber)
-                          }
-                        >
-                          <strong>{guitarString.stringNumber}</strong>
-                          <small>
-                            {formatNoteLabel(
-                              note,
-                              displaySettings.middleCStyle,
-                            )}
-                          </small>
-                        </button>
-                      )
-                    })}
-                  </div>
-                </div>
-              ) : null}
-
-              <div className="fretboard-display-control">
-                <span className="control-label">辅助显示</span>
-                <div className="fretboard-toggle-list">
-                  <button
-                    type="button"
-                    className={
-                      'toggle-button' +
-                      (practiceStringMode ? ' is-selected' : '')
-                    }
-                    aria-label="练习弦模式"
-                    aria-pressed={practiceStringMode}
-                    onClick={() =>
-                      setPreference(
-                        'practiceStringMode',
-                        !practiceStringMode,
-                      )
-                    }
-                  >
-                    <span className="toggle-indicator" />
-                    <span className="toggle-label-long" aria-hidden="true">
-                      练习弦模式
-                    </span>
-                    <span className="toggle-label-short" aria-hidden="true">
-                      练习弦
-                    </span>
-                  </button>
-                  <button
-                    type="button"
-                    className={
-                      'toggle-button' +
-                      (showPitchClass ? ' is-selected' : '')
-                    }
-                    aria-label="同音名其他八度"
-                    aria-pressed={showPitchClass}
-                    onClick={() => setShowPitchClass((current) => !current)}
-                  >
-                    <span className="toggle-indicator" />
-                    <span className="toggle-label-long" aria-hidden="true">
-                      同音名其他八度
-                    </span>
-                    <span className="toggle-label-short" aria-hidden="true">
-                      其他八度
-                    </span>
-                  </button>
-                </div>
-              </div>
-
-              <div className="legend" aria-label="指板音高图例">
-                {practiceStringMode ? (
-                  <>
-                    <span>
-                      <i className="legend-primary" />
-                      <span className="legend-label-long">
-                        练习弦 · 当前音高
-                      </span>
-                      <span className="legend-label-short">练习弦音高</span>
-                    </span>
-                    <span>
-                      <i className="legend-secondary" />
-                      <span className="legend-label-long">
-                        其他弦 · 同音高
-                      </span>
-                      <span className="legend-label-short">其他弦同音</span>
-                    </span>
-                  </>
-                ) : (
-                  <span>
-                    <i className="legend-equal" />
-                    <span className="legend-label-long">
-                      {learningMode === 'play'
-                        ? '弹奏音 · 全部位置'
-                        : '当前音高 · 全部位置'}
-                    </span>
-                    <span className="legend-label-short">
-                      {learningMode === 'play' ? '弹奏音' : '当前音高'}
-                    </span>
-                  </span>
-                )}
-                {showPitchClass ? (
-                  <span>
-                    <i className="legend-octave" />
-                    <span className="legend-label-long">
-                      同音名 · 其他八度
-                    </span>
-                    <span className="legend-label-short">其他八度</span>
-                  </span>
-                ) : null}
-              </div>
-
-              {learningMode === 'play' ? (
-                <GestureModeSwitch
-                  className="fretboard-gesture-control"
-                  label="指板手势"
-                  mode={fretboardGestureMode}
-                  onChange={setFretboardGestureMode}
-                />
-              ) : null}
-            </div>
-          </div>
-          <FretboardSurface
-            learningMode={learningMode}
-            canInvitePlayMode={canInvitePlayMode}
-            activeMidi={activeMidi}
-            middleCStyle={displaySettings.middleCStyle}
-            displayMidis={displayMidis}
-            soundingMidis={soundingMidis}
-            releasingMidis={playSession.releasingMidis}
-            playedPositions={playedPositions}
-            preferredString={preferredString}
-            practiceStringMode={practiceStringMode}
-            showPitchClass={showPitchClass}
-            gestureMode={fretboardGestureMode}
-            onSelectString={setPreferredString}
-            onPlayPosition={(position) =>
-              playNote({
-                midi: position.midi,
-                instrumentId: 'guitar',
-                source: 'fretboard',
-                stringNumber: position.stringNumber,
-                fret: position.fret,
-              })
-            }
-            onStartPosition={(pointerId, position) =>
-              startPlayVoice('fretboard:' + pointerId, {
-                midi: position.midi,
-                instrumentId: 'guitar',
-                source: 'fretboard',
-                stringNumber: position.stringNumber,
-                fret: position.fret,
-              })
-            }
-            onEndPosition={(pointerId) =>
-              stopPlayVoice('fretboard:' + pointerId)
-            }
-          />
-        </section>
+        <FretboardPanel
+          learningMode={learningMode}
+          canInvitePlayMode={canInvitePlayMode}
+          activeMidi={activeMidi}
+          middleCStyle={displaySettings.middleCStyle}
+          displayMidis={displayMidis}
+          soundingMidis={soundingMidis}
+          releasingMidis={playSession.releasingMidis}
+          playedPositions={playedPositions}
+          preferredString={preferredString}
+          practiceStringMode={practiceStringMode}
+          showPitchClass={showPitchClass}
+          gestureMode={fretboardGestureMode}
+          onSelectString={setPreferredString}
+          onTogglePracticeStringMode={() =>
+            setPreference('practiceStringMode', !practiceStringMode)
+          }
+          onToggleShowPitchClass={() =>
+            setShowPitchClass((current) => !current)
+          }
+          onGestureModeChange={setFretboardGestureMode}
+          onPlayPosition={(position) =>
+            playNote({
+              midi: position.midi,
+              instrumentId: 'guitar',
+              source: 'fretboard',
+              stringNumber: position.stringNumber,
+              fret: position.fret,
+            })
+          }
+          onStartPosition={(pointerId, position) =>
+            startPlayVoice('fretboard:' + pointerId, {
+              midi: position.midi,
+              instrumentId: 'guitar',
+              source: 'fretboard',
+              stringNumber: position.stringNumber,
+              fret: position.fret,
+            })
+          }
+          onEndPosition={(pointerId) =>
+            stopPlayVoice('fretboard:' + pointerId)
+          }
+        />
 
         <section className="secondary-grid">
           <KeyboardPanel
