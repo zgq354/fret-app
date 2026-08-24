@@ -14,6 +14,10 @@ import {
 } from './audio/audioSettings'
 import { usePitchDetection } from './audio/usePitchDetection'
 import { usePolyphonicPitchDetection } from './audio/usePolyphonicPitchDetection'
+import {
+  LearningPanel,
+  type ListenAnalysisMode,
+} from './app/LearningPanel'
 import { resolvePolyphonicFeedback } from './audio/polyphonicFeedback'
 import type {
   PolyphonicAnalysisState,
@@ -25,9 +29,7 @@ import {
   GestureModeSwitch,
   type PlayGestureMode,
 } from './components/GestureModeSwitch/GestureModeSwitch'
-import { MidiInputControl } from './components/MidiInputControl/MidiInputControl'
 import { PianoKeyboard } from './components/PianoKeyboard/PianoKeyboard'
-import { PitchMeter } from './components/PitchMeter/PitchMeter'
 import { TechnicalSettingsDialog } from './components/TechnicalSettings/TechnicalSettingsDialog'
 import {
   StaffView,
@@ -85,7 +87,6 @@ const LISTEN_ANALYSIS_MODE_STORAGE_KEY =
 const RELEASE_STYLE = {
   '--voice-release-duration': VOICE_RELEASE_MS + 'ms',
 } as CSSProperties
-type ListenAnalysisMode = 'single' | 'polyphonic'
 
 function App() {
   const [preferredString, setPreferredString] = useState(2)
@@ -504,302 +505,57 @@ function App() {
       </header>
 
       <main className={practiceStringMode ? 'has-practice-string' : undefined}>
-        <section className="top-grid">
-          <div className="intro">
-            <p className="eyebrow">声音 → 乐理 → 位置</p>
-            <h1>识别音符所在位置</h1>
-            <p className="intro-copy">
-              弹一个音或一组和声；识别结果会同时落到指板、键盘和五线谱上。
-            </p>
-          </div>
-          <PitchMeter
-            reading={activeReading}
-            middleCStyle={displaySettings.middleCStyle}
-            sourceLabel={sourceLabel}
-            readingMeta={readingMeta}
-            meterContent={
-              learningMode === 'play' ? (
-                <div className="polyphonic-panel" aria-live="polite">
-                  <span className="polyphonic-label">
-                    {playSession.displayMidis.length === 0
-                      ? '弹奏音'
-                      : playSession.isActive
-                        ? '弹奏中 · ' + playSession.displayMidis.length + ' 音'
-                        : playSession.isTransient
-                          ? '弹奏音 · ' + playSession.displayMidis.length + ' 音'
-                          : playSession.isReleasing
-                            ? '尾音 · ' + playSession.displayMidis.length + ' 音'
-                            : playSession.isRecent
-                              ? '最近弹奏 · ' + playSession.displayMidis.length + ' 音'
-                              : '弹奏音 · ' + playSession.displayMidis.length + ' 音'}
-                  </span>
-                  <strong>{noteSummary}</strong>
-                  <span className="polyphonic-hint">
-                    {playSession.isActive
-                      ? '多指可分别滑动与释放'
-                      : playSession.isTransient
-                        ? '点击后短暂显示当前音'
-                        : playSession.isReleasing
-                          ? '释放后自然衰减中'
-                          : playSession.isRecent
-                            ? '粘滞已保留最近弹奏'
-                            : '切到滑奏可多指按住发声'}
-                  </span>
-                </div>
-              ) : listenAnalysisMode === 'polyphonic' && isListening ? (
-                <div
-                  className={
-                    'polyphonic-panel is-' +
-                    polyphonicFeedback.appearance
-                  }
-                  aria-live="polite"
-                  aria-busy={polyphonicFeedback.isBusy}
-                >
-                  <div className="polyphonic-status-row">
-                    <span className="polyphonic-label">
-                      {polyphonicFeedback.label}
-                    </span>
-                    <span
-                      className="polyphonic-input-level"
-                      role="meter"
-                      aria-label="麦克风输入电平"
-                      aria-live="off"
-                      aria-valuemin={0}
-                      aria-valuemax={100}
-                      aria-valuenow={Math.round(
-                        polyphonicPitchDetection.inputLevel * 100,
-                      )}
-                    >
-                      <span
-                        style={{
-                          width:
-                            Math.round(
-                              polyphonicPitchDetection.inputLevel * 100,
-                            ) + '%',
-                        }}
-                      />
-                    </span>
-                  </div>
-                  <strong>{polyphonicFeedback.title}</strong>
-                  <span className="polyphonic-hint">
-                    {visibleChordReading &&
-                    hasLiveChord &&
-                    polyphonicPitchDetection.analysisState === 'result'
-                      ? formatNoteFrequencySummary(
-                          visibleChordReading.midis,
-                          displaySettings.middleCStyle,
-                        )
-                      : polyphonicFeedback.hint}
-                  </span>
-                </div>
-              ) : undefined
+        <LearningPanel
+          learningMode={learningMode}
+          listenAnalysisMode={listenAnalysisMode}
+          isListening={isListening}
+          microphoneRequesting={microphoneDetection.status === 'requesting'}
+          activeReading={activeReading}
+          activeMidi={activeMidi}
+          middleCStyle={displaySettings.middleCStyle}
+          sourceLabel={sourceLabel}
+          readingMeta={readingMeta}
+          play={{
+            displayMidis: playSession.displayMidis,
+            noteSummary,
+            isActive: playSession.isActive,
+            isTransient: playSession.isTransient,
+            isReleasing: playSession.isReleasing,
+            isRecent: playSession.isRecent,
+            sticky: playSession.sticky,
+            onToggleSticky: () =>
+              playSession.setSticky((current) => !current),
+          }}
+          polyphonic={{
+            feedback: polyphonicFeedback,
+            inputLevel: polyphonicPitchDetection.inputLevel,
+            analysisState: polyphonicPitchDetection.analysisState,
+            visibleChordReading,
+            hasLiveChord,
+          }}
+          stickyPitch={stickyPitch}
+          demoMidi={demoMidi}
+          minDemoMidi={MIN_DEMO_MIDI}
+          maxDemoMidi={MAX_DEMO_MIDI}
+          midi={midiInput}
+          midiInstrumentId={midiInstrumentId}
+          onSelectLearningMode={selectLearningMode}
+          onSelectListenAnalysisMode={selectListenAnalysisMode}
+          onToggleMicrophone={() => {
+            if (isListening) {
+              microphoneDetection.stop()
+            } else {
+              enableMicrophone()
             }
-            readingControl={
-              learningMode === 'play' ? (
-                <div className="pitch-control-group pitch-demo-control">
-                  <span className="control-label">弹奏音</span>
-                  <div className="pitch-demo-row">
-                    <output className="play-note-output" aria-live="polite">
-                      {activeMidi === null
-                        ? '等待点击'
-                        : formatNoteLabel(
-                            midiToNote(activeMidi),
-                            displaySettings.middleCStyle,
-                          )}
-                    </output>
-                    <button
-                      type="button"
-                      className={
-                        'sticky-mode-button' +
-                        (playSession.sticky ? ' is-selected' : '')
-                      }
-                      aria-pressed={playSession.sticky}
-                      title="释放后保留最近弹奏"
-                      onClick={() =>
-                        playSession.setSticky((current) => !current)
-                      }
-                    >
-                      <span aria-hidden="true" />
-                      粘滞
-                    </button>
-                  </div>
-                </div>
-              ) : listenAnalysisMode === 'polyphonic' && isListening ? (
-                <div className="pitch-control-group pitch-demo-control">
-                  <div className="pitch-demo-heading">
-                    <span className="control-label">识别和声</span>
-                  </div>
-                  <div className="pitch-demo-row">
-                    <output className="play-note-output" aria-live="polite">
-                      {polyphonicFeedback.shortLabel}
-                    </output>
-                    <button
-                      type="button"
-                      className={
-                        'sticky-mode-button' +
-                        (stickyPitch ? ' is-selected' : '')
-                      }
-                      aria-pressed={stickyPitch}
-                      title="无新和声时保留最后识别结果"
-                      onClick={() => setStickyPitch((current) => !current)}
-                    >
-                      <span aria-hidden="true" />
-                      粘滞
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <div className="pitch-control-group pitch-demo-control">
-                  <div className="pitch-demo-heading">
-                    <span className="control-label">
-                      {isListening ? '识别音' : '演示音'}
-                    </span>
-                  </div>
-                  <div className="pitch-demo-row">
-                    <div className="stepper">
-                      <button
-                        type="button"
-                        aria-label="降低半音"
-                        disabled={isListening || demoMidi <= MIN_DEMO_MIDI}
-                        onClick={() => moveDemoNote(-1)}
-                      >
-                        −
-                      </button>
-                      <output aria-live="polite">
-                        {activeMidi === null
-                          ? '—'
-                          : formatNoteLabel(
-                              midiToNote(activeMidi),
-                              displaySettings.middleCStyle,
-                            )}
-                      </output>
-                      <button
-                        type="button"
-                        aria-label="升高半音"
-                        disabled={isListening || demoMidi >= MAX_DEMO_MIDI}
-                        onClick={() => moveDemoNote(1)}
-                      >
-                        +
-                      </button>
-                    </div>
-                    <button
-                      type="button"
-                      className={
-                        'sticky-mode-button' +
-                        (stickyPitch ? ' is-selected' : '')
-                      }
-                      aria-pressed={stickyPitch}
-                      title="监听无新音高时保留最后识别音"
-                      onClick={() => setStickyPitch((current) => !current)}
-                    >
-                      <span aria-hidden="true" />
-                      粘滞
-                    </button>
-                  </div>
-                </div>
-              )
-            }
-            controls={
-              <div className="pitch-controls" aria-label="音高输入">
-                <div className="pitch-control-group input-mode-control">
-                  <span className="control-label">输入模式</span>
-                  <div className="input-mode-switch" aria-label="输入模式">
-                    <button
-                      type="button"
-                      className={
-                        learningMode === 'listen' ? 'is-selected' : ''
-                      }
-                      aria-pressed={learningMode === 'listen'}
-                      onClick={() => selectLearningMode('listen')}
-                    >
-                      监听
-                    </button>
-                    <button
-                      type="button"
-                      className={learningMode === 'play' ? 'is-selected' : ''}
-                      aria-pressed={learningMode === 'play'}
-                      onClick={() => selectLearningMode('play')}
-                    >
-                      弹奏
-                    </button>
-                  </div>
-                </div>
-                {learningMode === 'listen' ? (
-                  <div className="pitch-control-group microphone-control">
-                    <div className="microphone-heading">
-                      <span className="control-label">实时麦克风</span>
-                      <div
-                        className="compact-switch analysis-mode-switch"
-                        aria-label="识别模式"
-                      >
-                        <button
-                          type="button"
-                          className={
-                            listenAnalysisMode === 'single'
-                              ? 'is-selected'
-                              : ''
-                          }
-                          aria-pressed={listenAnalysisMode === 'single'}
-                          onClick={() => selectListenAnalysisMode('single')}
-                        >
-                          单音
-                        </button>
-                        <button
-                          type="button"
-                          className={
-                            listenAnalysisMode === 'polyphonic'
-                              ? 'is-selected'
-                              : ''
-                          }
-                          aria-pressed={listenAnalysisMode === 'polyphonic'}
-                          onClick={() =>
-                            selectListenAnalysisMode('polyphonic')
-                          }
-                        >
-                          多音
-                        </button>
-                      </div>
-                    </div>
-                    <button
-                      type="button"
-                      className={
-                        'mic-button' + (isListening ? ' is-live' : '')
-                      }
-                      disabled={microphoneDetection.status === 'requesting'}
-                      onClick={() => {
-                        if (isListening) {
-                          microphoneDetection.stop()
-                        } else {
-                          enableMicrophone()
-                        }
-                      }}
-                    >
-                      <span className="mic-icon" aria-hidden="true">
-                        {isListening ? '■' : '●'}
-                      </span>
-                      {microphoneDetection.status === 'requesting'
-                        ? '正在请求权限'
-                        : isListening
-                          ? '停止麦克风'
-                          : '启用麦克风'}
-                    </button>
-                  </div>
-                ) : (
-                  <MidiInputControl
-                    midi={midiInput}
-                    instrumentId={midiInstrumentId}
-                    onConnect={() => {
-                      void playback.prepare()
-                      void midiInput.connect()
-                    }}
-                    onSelectInput={midiInput.selectInput}
-                    onInstrumentChange={setMidiInstrumentId}
-                  />
-                )}
-              </div>
-            }
-          />
-        </section>
+          }}
+          onMoveDemoNote={moveDemoNote}
+          onToggleStickyPitch={() => setStickyPitch((current) => !current)}
+          onMidiConnect={() => {
+            void playback.prepare()
+            void midiInput.connect()
+          }}
+          onMidiInstrumentChange={setMidiInstrumentId}
+        />
 
         {audioErrorMessage ? (
           <div className="error-banner" role="alert">
@@ -1132,22 +888,6 @@ function formatNoteSummary(
     .map((midi) => formatNoteLabel(midiToNote(midi), middleCStyle))
   const remaining = midis.length - visible.length
   return visible.join(' · ') + (remaining > 0 ? '  +' + remaining : '')
-}
-
-function formatNoteFrequencySummary(
-  midis: readonly number[],
-  middleCStyle: MiddleCStyle,
-): string {
-  return midis
-    .slice(0, 4)
-    .map(
-      (midi) =>
-        formatNoteLabel(midiToNote(midi), middleCStyle) +
-        ' ' +
-        midiToFrequency(midi).toFixed(1) +
-        'Hz',
-    )
-    .join(' · ')
 }
 
 function createStandardPitchReading(midi: number): PitchReading {
