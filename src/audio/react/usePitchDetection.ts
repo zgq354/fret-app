@@ -2,18 +2,18 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   DEFAULT_AUDIO_SETTINGS,
   type AudioSettings,
-} from './audioSettings'
+} from '../audioSettings'
 import {
   createPitchReading,
   type PitchReading,
-} from '../music/musicTheory'
-import { detectPitch, sensitivityToSilenceThreshold } from './detectPitch'
-import { configureAudioSession } from './audioSession'
+} from '../../music/musicTheory'
+import { detectPitch, sensitivityToSilenceThreshold } from '../detectPitch'
+import { configureAudioSession } from '../audioSession'
 import {
   createMicrophoneConstraints,
   stopMediaStream,
   type MicrophoneDetectionStatus,
-} from './microphoneInput'
+} from '../microphoneInput'
 
 interface AudioResources {
   context: AudioContext

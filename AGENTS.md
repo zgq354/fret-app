@@ -29,6 +29,7 @@ Fret & Key is a static browser application for learning the relationship between
 - Keep `src/music/` deterministic and independent of React, DOM, Web Audio, browser storage, and network APIs.
 - Keep capture and inference in `src/audio/`; components receive state and callbacks rather than owning microphone or Worker lifecycle.
 - Keep browser-host differences in `src/platform/`, `src/midi/`, `src/playback/`, or `src/audio/` adapters. Do not spread feature detection through views.
+- Keep headless owner files independent of React. Hooks that adapt `audio`, `learning`, `midi`, `playback`, `settings`, or `platform` state to React live under that owner's `react/` subtree.
 - `App.tsx` may compose modules, but new reusable policy belongs in its owning module rather than growing a second domain model in the root component.
 - Local Edge owns offline release and request interception. This application owns its `fwa.config.json`, product UI, and release policy; it must not deep-import Local Edge internals.
 - Production credentials remain GitHub Environment secrets. Do not add `.env` loading, credentials, or deployment tokens to source, tests, or public documentation.

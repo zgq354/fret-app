@@ -2,29 +2,29 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   DEFAULT_AUDIO_SETTINGS,
   type AudioSettings,
-} from './audioSettings'
-import { configureAudioSession } from './audioSession'
-import { AudioSampleRing } from './audioSampleRing'
-import { sensitivityToSilenceThreshold } from './detectPitch'
+} from '../audioSettings'
+import { configureAudioSession } from '../audioSession'
+import { AudioSampleRing } from '../audioSampleRing'
+import { sensitivityToSilenceThreshold } from '../detectPitch'
 import {
   createMicrophoneConstraints,
   stopMediaStream,
   type MicrophoneDetectionStatus,
-} from './microphoneInput'
+} from '../microphoneInput'
 import {
   createPolyphonicInferenceClient,
   PolyphonicInferenceBusy,
   PolyphonicWorkerFailure,
   type PolyphonicInferenceClient,
-} from './polyphonicInferenceClient'
+} from '../polyphonicInferenceClient'
 import {
   BASIC_PITCH_INPUT_SAMPLES,
   BASIC_PITCH_SAMPLE_RATE,
   type PolyphonicAnalysisState,
   type PolyphonicModelState,
-} from './polyphonicInferenceMessages'
-import { resampleAudio } from './resampleAudio'
-import type { ChordReading } from '../music/chordAnalysis'
+} from '../polyphonicInferenceMessages'
+import { resampleAudio } from '../resampleAudio'
+import type { ChordReading } from '../../music/chordAnalysis'
 
 const WORKLET_PATH = '/audio/pcm-capture-worklet.js'
 const INPUT_LEVEL_UPDATE_INTERVAL_MS = 120

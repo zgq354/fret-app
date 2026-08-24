@@ -8,10 +8,8 @@ import {
   midiToNote,
   type MiddleCStyle,
 } from '../../music/musicTheory'
-import {
-  resolveGlissandoTarget,
-  usePointerGlissando,
-} from '../../playback/pointerGlissando'
+import { resolveGlissandoTarget } from '../../playback/pointerGlissando'
+import { usePointerGlissando } from '../../playback/react/usePointerGlissando'
 import {
   DISPLAY_STRINGS,
   FRET_COUNT,

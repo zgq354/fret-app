@@ -1,8 +1,8 @@
 import { useMemo, useRef, useState, type CSSProperties } from 'react'
 import './App.css'
 import { useAudioSettings } from './audio/react/useAudioSettings'
-import { usePitchDetection } from './audio/usePitchDetection'
-import { usePolyphonicPitchDetection } from './audio/usePolyphonicPitchDetection'
+import { usePitchDetection } from './audio/react/usePitchDetection'
+import { usePolyphonicPitchDetection } from './audio/react/usePolyphonicPitchDetection'
 import { FretboardPanel } from './components/FretboardPanel/FretboardPanel'
 import { KeyboardPanel } from './components/KeyboardPanel/KeyboardPanel'
 import { LearningPanel } from './components/LearningPanel/LearningPanel'
@@ -24,7 +24,7 @@ import {
 import type { ListenAnalysisMode } from './learning/listenAnalysisMode'
 import type { PlayNoteRequest } from './learning/playSession'
 import { useListeningHistory } from './learning/react/useListeningHistory'
-import { usePlaySession } from './learning/usePlaySession'
+import { usePlaySession } from './learning/react/usePlaySession'
 import { getFretPosition } from './music/fretboard'
 import type { ChordReading } from './music/chordAnalysis'
 import {
@@ -36,9 +36,9 @@ import {
   type MiddleCStyle,
   type PitchReading,
 } from './music/musicTheory'
-import { useMidiInput } from './midi/useMidiInput'
+import { useMidiInput } from './midi/react/useMidiInput'
 import { VOICE_RELEASE_MS } from './playback/instrument'
-import { usePlayback } from './playback/usePlayback'
+import { usePlayback } from './playback/react/usePlayback'
 import { setFwaDebugEnabled } from './platform/fwa-debug-state/fwa-debug-state'
 import { useFwaDebugState } from './platform/fwa-debug-state/react/useFwaDebugState'
 import { applyFwaUpdate } from './platform/fwa-update/fwa-update'

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { createPlaybackRuntime } from './createPlaybackRuntime'
-import type { InstrumentId, PlaybackRuntime } from './instrument'
+import { createPlaybackRuntime } from '../createPlaybackRuntime'
+import type { InstrumentId, PlaybackRuntime } from '../instrument'
 
 interface PlaybackState {
   errorMessage: string | null

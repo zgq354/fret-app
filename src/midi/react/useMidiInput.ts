@@ -2,13 +2,13 @@ import { useCallback, useEffect, useReducer, useRef } from 'react'
 import {
   parseMidiMessage,
   type MidiNoteOnEvent,
-} from './midiMessage'
+} from '../midiMessage'
 import {
   createMidiSessionState,
   reduceMidiSession,
   type MidiInputDevice,
   type MidiSessionState,
-} from './midiSession'
+} from '../midiSession'
 
 type RequestMidiAccess = (
   options?: MIDIOptions,

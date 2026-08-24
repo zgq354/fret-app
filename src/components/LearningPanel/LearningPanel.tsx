@@ -10,7 +10,7 @@ import {
   type MiddleCStyle,
   type PitchReading,
 } from '../../music/musicTheory'
-import type { MidiInputState } from '../../midi/useMidiInput'
+import type { MidiInputState } from '../../midi/react/useMidiInput'
 import type { InstrumentId } from '../../playback/instrument'
 import type { LearningMode } from '../../learning/playMode'
 import type { ListenAnalysisMode } from '../../learning/listenAnalysisMode'
