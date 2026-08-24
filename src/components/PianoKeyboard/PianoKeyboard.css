@@ -1,0 +1,21 @@
+.piano-key.is-interactive {
+  cursor: pointer;
+  outline: none;
+}
+
+.piano-svg.is-glissando {
+  touch-action: none;
+}
+
+.piano-key.is-playable.is-glissando {
+  touch-action: none;
+}
+
+.piano-key.is-interactive:hover {
+  filter: brightness(1.12);
+}
+
+.piano-key.is-interactive:focus-visible {
+  stroke: var(--cyan);
+  stroke-width: 3;
+}

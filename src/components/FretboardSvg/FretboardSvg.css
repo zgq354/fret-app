@@ -1,0 +1,25 @@
+.fret-play-target {
+  fill: transparent;
+  stroke: transparent;
+  cursor: pointer;
+  outline: none;
+  transition: fill 100ms ease;
+}
+
+.fretboard-svg.is-glissando {
+  touch-action: none;
+}
+
+.fret-play-target.is-glissando {
+  touch-action: none;
+}
+
+.fret-play-target:hover {
+  fill: rgba(102, 215, 209, 0.08);
+}
+
+.fret-play-target:focus-visible {
+  fill: rgba(102, 215, 209, 0.1);
+  stroke: var(--cyan);
+  stroke-width: 2;
+}

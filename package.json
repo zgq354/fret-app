@@ -1,0 +1,52 @@
+{
+  "name": "fret-app",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "packageManager": "pnpm@11.18.0",
+  "license": "MIT",
+  "homepage": "https://fret-app.zgq.me/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zgq354/fret-app.git"
+  },
+  "bugs": {
+    "url": "https://github.com/zgq354/fret-app/issues"
+  },
+  "scripts": {
+    "dev": "vite",
+    "generate-assets": "node scripts/generate-assets.mjs",
+    "build": "node scripts/generate-assets.mjs && tsc -b && vite build && vite build --config vite.fwa-loader.config.ts && vite build --config vite.fwa-worker.config.ts && fwa-publish-release && node scripts/check-pwa.mjs dist && node scripts/check-site.mjs dist",
+    "build:production": "FRET_REQUIRE_WEB_ANALYTICS=1 pnpm build",
+    "check:deployment": "node scripts/check-deployment.mjs",
+    "check:site": "node scripts/check-site.mjs dist",
+    "check:pwa": "node scripts/check-pwa.mjs dist",
+    "ci": "pnpm lint && pnpm typecheck && pnpm test && pnpm e2e:local-edge && pnpm build",
+    "e2e:local-edge": "playwright test e2e/local-edge.e2e.ts",
+    "lint": "oxlint",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "typecheck": "tsc -b --pretty false"
+  },
+  "dependencies": {
+    "@spotify/basic-pitch": "1.0.1",
+    "@tensorflow/tfjs": "3.21.0",
+    "@tonaljs/chord-detect": "4.9.1",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.61.1",
+    "@types/node": "^24.13.2",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.3",
+    "@fullstack-webapp/local-edge": "0.1.0-beta.2",
+    "oxlint": "^1.71.0",
+    "sharp": "^0.34.5",
+    "typescript": "~6.0.2",
+    "vite": "^8.1.1",
+    "vite-plugin-static-copy": "4.1.1",
+    "vitest": "^4.1.10"
+  }
+}

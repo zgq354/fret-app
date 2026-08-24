@@ -1,0 +1,100 @@
+.midi-input-control {
+  gap: 4px;
+  min-width: 0;
+  box-sizing: border-box;
+  padding-block: 2px;
+}
+
+.midi-control-row {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr);
+  gap: 6px;
+  align-items: center;
+  min-width: 0;
+}
+
+.midi-control-row > .control-label {
+  margin: 0;
+  white-space: nowrap;
+}
+
+.midi-connect-button,
+.midi-connection-status,
+.midi-device-select {
+  width: 100%;
+  min-width: 78px;
+  min-height: 26px;
+  box-sizing: border-box;
+  border: 1px solid var(--line-strong);
+  border-radius: 9px;
+  color: var(--muted-bright);
+  background: var(--surface-soft);
+  font-family: inherit;
+  font-size: 9px;
+}
+
+.midi-connect-button {
+  padding: 0 8px;
+  cursor: pointer;
+}
+
+.midi-connect-button:disabled {
+  color: var(--muted);
+  cursor: default;
+}
+
+.midi-connection-status {
+  display: flex;
+  padding: 0 8px;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.midi-connection-status.is-unsupported {
+  min-width: 78px;
+}
+
+.midi-device-select {
+  overflow: hidden;
+  padding: 0 24px 0 7px;
+  color-scheme: dark;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.midi-instrument-switch {
+  display: grid;
+  width: 100%;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  min-height: 26px;
+  padding: 2px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: #0e1115;
+}
+
+.midi-instrument-switch button {
+  min-width: 0;
+  padding: 0 3px;
+  border: 0;
+  border-radius: 6px;
+  color: var(--muted);
+  background: transparent;
+  font-size: 8px;
+  cursor: pointer;
+}
+
+.midi-instrument-switch button.is-selected {
+  color: var(--cyan);
+  background: var(--cyan-soft);
+}
+
+@media (max-width: 460px) {
+  .midi-connect-button,
+  .midi-connection-status,
+  .midi-device-select {
+    min-width: 70px;
+    font-size: 8px;
+  }
+}
