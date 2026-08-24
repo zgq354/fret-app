@@ -22,13 +22,13 @@ The pure `music` module is the lower dependency layer. Browser adapters and inte
 
 ### Listening
 
-For monophonic listening, `audio/usePitchDetection.ts` captures microphone samples through the Web Audio API, estimates a frequency, and converts it to a `PitchReading` through `music`.
+For monophonic listening, `audio/react/usePitchDetection.ts` captures microphone samples through the Web Audio API, estimates a frequency, and converts it to a `PitchReading` through `music`.
 
-For experimental polyphonic listening, `audio/usePolyphonicPitchDetection.ts` captures PCM through the public AudioWorklet, maintains a bounded sample ring, and sends analysis work to a Worker. The Worker loads Basic Pitch and returns note candidates; `music/chordAnalysis.ts` turns a result into a displayable chord reading. The feature is intentionally not source separation or continuous-song transcription.
+For experimental polyphonic listening, `audio/react/usePolyphonicPitchDetection.ts` captures PCM through the public AudioWorklet, maintains a bounded sample ring, and sends analysis work to a Worker. The Worker loads Basic Pitch and returns note candidates; `music/chordAnalysis.ts` turns a result into a displayable chord reading. The feature is intentionally not source separation or continuous-song transcription.
 
 ### Playing
 
-Touch and pointer interaction creates a `PlayNoteRequest`. `learning/usePlaySession.ts` owns the visible and sounding-note session, while `playback/usePlayback.ts` owns Web Audio output. `midi/useMidiInput.ts` adapts MIDI device events into the same play-session path, so UI, touch, and MIDI do not create separate music models.
+Touch and pointer interaction creates a `PlayNoteRequest`. `learning/react/usePlaySession.ts` owns the visible and sounding-note session, while `playback/react/usePlayback.ts` owns Web Audio output. `midi/react/useMidiInput.ts` adapts MIDI device events into the same play-session path, so UI, touch, and MIDI do not create separate music models.
 
 ### Views
 
