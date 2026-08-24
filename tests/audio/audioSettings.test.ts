@@ -5,7 +5,7 @@ import {
   loadAudioSettings,
   normalizeAudioSettings,
   saveAudioSettings,
-} from '../../src/audio/audioSettings'
+} from '../../src/modules/audio/audioSettings'
 
 describe('audio settings', () => {
   it('uses a more sensitive mobile-friendly default', () => {

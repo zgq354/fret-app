@@ -12,25 +12,25 @@ Fret & Key is a static browser application for learning the relationship between
 
 | Path | Scope |
 | --- | --- |
-| `src/App.tsx` | Application composition and cross-module interaction policy; it does not contain independent pitch, notation, audio, or release algorithms. |
-| `src/music/` | Pure music theory, chord analysis, fretboard geometry, and staff-note transforms. Keep browser APIs and React out. |
-| `src/audio/` | Microphone capture, monophonic and polyphonic analysis, worklet / Worker clients, and audio settings. |
-| `src/learning/` | Learning-mode state and play-session policy. |
-| `src/playback/` | Web Audio output and pointer / voice lifecycle. |
-| `src/midi/` | Web MIDI input adapter and session lifecycle. |
-| `src/settings/` | Persisted display preferences and normalization. |
+| `src/App.tsx` | Application composition root. It selects module public entries without owning product state or runtime policy. |
+| `src/modules/learning-surface/` | Public learning experience: listen / play coordination, display projection, page panels, and module-local React state. |
+| `src/modules/music/` | Pure music theory, chord analysis, fretboard geometry, and staff-note transforms. Keep browser APIs and React out. |
+| `src/modules/audio/` | Microphone capture, monophonic and polyphonic analysis, worklet / Worker clients, and audio settings. |
+| `src/modules/playback/` | Web Audio output and pointer / voice lifecycle. |
+| `src/modules/midi/` | Web MIDI input adapter and session lifecycle. |
+| `src/modules/settings/` | Persisted display preferences and normalization. |
 | `src/platform/` | Browser-host adapters for Local Edge diagnostics and release updates. |
-| `src/components/` | React views and interaction controls, including page panels. They receive state and callbacks without taking over audio, MIDI, or playback lifecycle. |
 | `public/` | Static assets, PWA metadata, the PCM worklet, and host routing artifacts. |
 | `tests/` | Unit and browser evidence, grouped by runtime module; `tests/e2e/` covers public behavior and Local Edge releases. |
 
 ## Boundary rules
 
-- Keep `src/music/` deterministic and independent of React, DOM, Web Audio, browser storage, and network APIs.
-- Keep capture and inference in `src/audio/`; components receive state and callbacks rather than owning microphone or Worker lifecycle.
-- Keep browser-host differences in `src/platform/`, `src/midi/`, `src/playback/`, or `src/audio/` adapters. Do not spread feature detection through views.
-- Keep headless owner files independent of React. Hooks that adapt `audio`, `learning`, `midi`, `playback`, `settings`, or `platform` state to React live under that owner's `react/` subtree.
-- `App.tsx` may compose modules, but new reusable policy belongs in its owning module rather than growing a second domain model in the root component.
+- Keep `src/modules/music/` deterministic and independent of React, DOM, Web Audio, browser storage, and network APIs.
+- Keep capture and inference in `src/modules/audio/`; learning-surface components receive state and callbacks rather than owning microphone or Worker lifecycle.
+- Keep browser-host differences in `src/platform/`, `src/modules/midi/`, `src/modules/playback/`, or `src/modules/audio/` adapters. Do not spread feature detection through views.
+- Keep headless owner files independent of React. Hooks that adapt `audio`, `midi`, `playback`, `settings`, or `platform` state to React live under that owner's `react/` subtree.
+- `src/modules/learning-surface/learning-surface.tsx` is the module public entry. App-level composition must not deep-import its components, hooks, or model.
+- Framework-neutral learning projection and transition policy stay under `learning-surface/model/`; module-local React lifecycle stays under `learning-surface/hooks/`.
 - Local Edge owns offline release and request interception. This application owns its `fwa.config.json`, product UI, and release policy; it must not deep-import Local Edge internals.
 - Production credentials remain GitHub Environment secrets. Do not add `.env` loading, credentials, or deployment tokens to source, tests, or public documentation.
 

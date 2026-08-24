@@ -6,7 +6,7 @@ import {
   getUniqueMidis,
   reducePlaySession,
   type PlayNoteRequest,
-} from '../../src/learning/playSession'
+} from '../../src/modules/learning-surface/model/play-session'
 
 describe('reducePlaySession', () => {
   it('tracks multiple voices and releases them independently', () => {

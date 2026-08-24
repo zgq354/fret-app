@@ -6,33 +6,32 @@ Fret & Key is a static browser application. It turns microphone, touch, and MIDI
 
 | Module | Responsibility | Does not contain |
 | --- | --- | --- |
-| `music` | Pitch naming, frequencies, chord candidates, standard-tuning fret positions, and notation transforms | React state, browser APIs, audio device access |
-| `audio` | Microphone constraints, capture, monophonic analysis, polyphonic Worker inference, and persisted analysis settings | UI layout or note rendering |
-| `learning` | Listen / play mode, displayed notes, and play-session policy | Device or audio implementation |
-| `playback` | Web Audio voices, pointer glissando, and voice lifecycle | MIDI transport or music-theory rules |
-| `midi` | Web MIDI input discovery and Note On / Note Off adaptation | Audio synthesis or UI state |
-| `settings` | Display preference persistence and normalization | Audio capture or release lifecycle |
+| `modules/music` | Pitch naming, frequencies, chord candidates, standard-tuning fret positions, and notation transforms | React state, browser APIs, audio device access |
+| `modules/audio` | Microphone constraints, capture, monophonic analysis, polyphonic Worker inference, and persisted analysis settings | UI layout or note rendering |
+| `modules/learning-surface` | Listen / play coordination, shared display projection, and the fretboard, piano, and staff learning surface | Device-specific audio or MIDI implementation |
+| `modules/playback` | Web Audio voices, pointer glissando, and voice lifecycle | MIDI transport or music-theory rules |
+| `modules/midi` | Web MIDI input discovery and Note On / Note Off adaptation | Audio synthesis or UI state |
+| `modules/settings` | Display preference persistence and normalization | Audio capture or release lifecycle |
 | `platform` | Local Edge update and diagnostics adapters | Service Worker implementation |
-| `components` | React surfaces for the fretboard, piano, staff, input controls, and settings | Cross-surface policy or browser runtime ownership |
-| `App.tsx` | Composition of module state, user-intent transitions, and props for the visible surface | Independent domain algorithms |
+| `App.tsx` | Composition of module public entries | Product state, runtime lifecycle, or independent domain algorithms |
 
-The pure `music` module is the lower dependency layer. Browser adapters and interaction policy may consume it; it must not import from React, DOM, storage, or host modules. Components may combine owned state for a visible surface, while `App.tsx` remains the only application-wide composition root.
+The pure `modules/music` capability is the lower dependency layer. Browser adapters and interaction policy may consume it; it must not import from React, DOM, storage, or host modules. `modules/learning-surface/learning-surface.tsx` is the product module’s public entry: its `model/` is framework-neutral, its `hooks/` coordinate React lifecycles, and its `components/` render the visible surface. `App.tsx` remains the application-wide composition root and imports only that public entry.
 
 ## Input to display
 
 ### Listening
 
-For monophonic listening, `audio/react/usePitchDetection.ts` captures microphone samples through the Web Audio API, estimates a frequency, and converts it to a `PitchReading` through `music`.
+For monophonic listening, `modules/audio/react/usePitchDetection.ts` captures microphone samples through the Web Audio API, estimates a frequency, and converts it to a `PitchReading` through `modules/music`.
 
-For experimental polyphonic listening, `audio/react/usePolyphonicPitchDetection.ts` captures PCM through the public AudioWorklet, maintains a bounded sample ring, and sends analysis work to a Worker. The Worker loads Basic Pitch and returns note candidates; `music/chordAnalysis.ts` turns a result into a displayable chord reading. The feature is intentionally not source separation or continuous-song transcription.
+For experimental polyphonic listening, `modules/audio/react/usePolyphonicPitchDetection.ts` captures PCM through the public AudioWorklet, maintains a bounded sample ring, and sends analysis work to a Worker. The Worker loads Basic Pitch and returns note candidates; `modules/music/chordAnalysis.ts` turns a result into a displayable chord reading. The feature is intentionally not source separation or continuous-song transcription.
 
 ### Playing
 
-Touch and pointer interaction creates a `PlayNoteRequest`. `learning/react/usePlaySession.ts` owns the visible and sounding-note session, while `playback/react/usePlayback.ts` owns Web Audio output. `midi/react/useMidiInput.ts` adapts MIDI device events into the same play-session path, so UI, touch, and MIDI do not create separate music models.
+Touch and pointer interaction creates a `PlayNoteRequest`. `modules/learning-surface/hooks/usePlaySession.ts` owns the visible and sounding-note session, while `modules/playback/react/usePlayback.ts` owns Web Audio output. `modules/midi/react/useMidiInput.ts` adapts MIDI device events into the same play-session path, so UI, touch, and MIDI do not create separate music models.
 
 ### Views
 
-`App.tsx` selects one active reading and passes it to the fretboard, piano, and staff components. Each surface projects the same MIDI / pitch-class information for its own geometry; it does not reinterpret microphone or MIDI events.
+`modules/learning-surface/model/learning-surface-display.ts` selects one active reading and produces the common MIDI, chord, source-label, and playback projection. The fretboard, piano, and staff components consume that result for their own geometry; they do not reinterpret microphone or MIDI events.
 
 ## Release and offline model
 
@@ -48,7 +47,7 @@ GitHub Actions runs the public verification matrix without build configuration o
 
 ## Verification
 
-- Unit tests cover music transforms, audio helpers, settings, MIDI adaptation, play-session policy, and Local Edge adapters.
+- Unit tests cover music transforms, audio helpers, settings, MIDI adaptation, playSession policy, and Local Edge adapters.
 - Local Edge browser tests cover installation, offline restart, network escape, diagnostics, and complete-release updates.
 - `pnpm build` checks static assets, PWA metadata, host ownership, and the release descriptor.
 - CI combines linting, type checking, unit tests, browser evidence, and the public build. The protected deployment workflow reruns it before publishing and then checks the production URL.

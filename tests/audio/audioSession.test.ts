@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   configureAudioSession,
   type AudioSessionType,
-} from '../../src/audio/audioSession'
+} from '../../src/modules/audio/audioSession'
 
 describe('configureAudioSession', () => {
   it('sets the requested type when the API is available', () => {

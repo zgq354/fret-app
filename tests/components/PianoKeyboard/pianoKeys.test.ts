@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { createPianoKeys } from '../../../src/components/PianoKeyboard/pianoKeys'
+import { createPianoKeys } from '../../../src/modules/learning-surface/components/PianoKeyboard/pianoKeys'
 
 describe('createPianoKeys', () => {
   it('creates every chromatic key from C2 through C7', () => {

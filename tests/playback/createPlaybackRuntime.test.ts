@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
-import { createPlaybackRuntime } from '../../src/playback/createPlaybackRuntime'
-import type { InstrumentDriver, PlaybackBackend } from '../../src/playback/instrument'
+import { createPlaybackRuntime } from '../../src/modules/playback/createPlaybackRuntime'
+import type { InstrumentDriver, PlaybackBackend } from '../../src/modules/playback/instrument'
 
 function createDriver(): InstrumentDriver {
   return {

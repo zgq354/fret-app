@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { createGlissandoTracker } from '../../src/playback/pointerGlissando'
+import { createGlissandoTracker } from '../../src/modules/playback/pointerGlissando'
 
 describe('createGlissandoTracker', () => {
   it('starts the initial target and replaces it on each newly entered target', () => {

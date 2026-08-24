@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { DEFAULT_AUDIO_SETTINGS } from '../../src/audio/audioSettings'
-import { createMicrophoneConstraints } from '../../src/audio/microphoneInput'
+import { DEFAULT_AUDIO_SETTINGS } from '../../src/modules/audio/audioSettings'
+import { createMicrophoneConstraints } from '../../src/modules/audio/microphoneInput'
 
 describe('microphone input', () => {
   it('keeps processing flags explicit and prefers a mono input', () => {
