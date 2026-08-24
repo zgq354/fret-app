@@ -2,6 +2,7 @@ allowBuilds:
   core-js: false
   esbuild: true
   sharp: true
+  workerd: true
 minimumReleaseAgeExclude:
   - '@fullstack-webapp/local-edge@0.1.0-beta.2'
 onlyBuiltDependencies:
