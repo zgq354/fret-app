@@ -15,6 +15,9 @@ import {
 import { usePitchDetection } from './audio/usePitchDetection'
 import { usePolyphonicPitchDetection } from './audio/usePolyphonicPitchDetection'
 import {
+  FretboardSurface,
+} from './app/FretboardSurface'
+import {
   LearningPanel,
   type ListenAnalysisMode,
 } from './app/LearningPanel'
@@ -24,7 +27,6 @@ import type {
   PolyphonicModelState,
 } from './audio/polyphonicInferenceMessages'
 import { EntryDialog } from './components/EntryDialog/EntryDialog'
-import { FretboardSvg } from './components/FretboardSvg/FretboardSvg'
 import {
   GestureModeSwitch,
   type PlayGestureMode,
@@ -719,47 +721,42 @@ function App() {
               ) : null}
             </div>
           </div>
-          <div className="fretboard-scroll">
-            <FretboardSvg
-              midi={activeMidi}
-              middleCStyle={displaySettings.middleCStyle}
-              midis={displayMidis}
-              activeMidis={soundingMidis}
-              releasingMidis={playSession.releasingMidis}
-              playedPositions={playedPositions}
-              preferredString={preferredString}
-              highlightPracticeString={practiceStringMode}
-              showPitchClass={showPitchClass}
-              playable={learningMode === 'play'}
-              interactive={learningMode === 'play' || canInvitePlayMode}
-              glissandoEnabled={
-                learningMode === 'play' &&
-                fretboardGestureMode === 'glissando'
-              }
-              onSelectString={setPreferredString}
-              onPlayPosition={(position) =>
-                playNote({
-                  midi: position.midi,
-                  instrumentId: 'guitar',
-                  source: 'fretboard',
-                  stringNumber: position.stringNumber,
-                  fret: position.fret,
-                })
-              }
-              onStartPosition={(pointerId, position) =>
-                startPlayVoice('fretboard:' + pointerId, {
-                  midi: position.midi,
-                  instrumentId: 'guitar',
-                  source: 'fretboard',
-                  stringNumber: position.stringNumber,
-                  fret: position.fret,
-                })
-              }
-              onEndPosition={(pointerId) =>
-                stopPlayVoice('fretboard:' + pointerId)
-              }
-            />
-          </div>
+          <FretboardSurface
+            learningMode={learningMode}
+            canInvitePlayMode={canInvitePlayMode}
+            activeMidi={activeMidi}
+            middleCStyle={displaySettings.middleCStyle}
+            displayMidis={displayMidis}
+            soundingMidis={soundingMidis}
+            releasingMidis={playSession.releasingMidis}
+            playedPositions={playedPositions}
+            preferredString={preferredString}
+            practiceStringMode={practiceStringMode}
+            showPitchClass={showPitchClass}
+            gestureMode={fretboardGestureMode}
+            onSelectString={setPreferredString}
+            onPlayPosition={(position) =>
+              playNote({
+                midi: position.midi,
+                instrumentId: 'guitar',
+                source: 'fretboard',
+                stringNumber: position.stringNumber,
+                fret: position.fret,
+              })
+            }
+            onStartPosition={(pointerId, position) =>
+              startPlayVoice('fretboard:' + pointerId, {
+                midi: position.midi,
+                instrumentId: 'guitar',
+                source: 'fretboard',
+                stringNumber: position.stringNumber,
+                fret: position.fret,
+              })
+            }
+            onEndPosition={(pointerId) =>
+              stopPlayVoice('fretboard:' + pointerId)
+            }
+          />
         </section>
 
         <section className="secondary-grid">
