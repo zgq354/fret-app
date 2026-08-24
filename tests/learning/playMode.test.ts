@@ -3,7 +3,7 @@ import {
   createPitchReading,
   MiddleCStyle,
 } from '../../src/modules/music/musicTheory'
-import { canPromptPlayMode, resolveLearningDisplay } from '../../src/learning/playMode'
+import { canPromptPlayMode, resolveLearningDisplay } from '../../src/modules/learning-surface/model/play-mode'
 
 const baseInput = {
   mode: 'listen' as const,
