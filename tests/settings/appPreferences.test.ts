@@ -14,6 +14,10 @@ describe('app preferences', () => {
   })
 
   it('round-trips the existing preference keys', () => {
+    expect(ListenAnalysisModeStorageKey).toBe(
+      'guitar-note-map.listen-analysis-mode.v1',
+    )
+
     const values = new Map<string, string>()
     const storage = {
       getItem: (key: string) => values.get(key) ?? null,

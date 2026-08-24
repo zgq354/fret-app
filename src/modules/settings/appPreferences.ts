@@ -18,7 +18,7 @@ export const PracticeModeStorageKey = 'guitar-note-map.practice-mode.v1'
 export const MidiInstrumentStorageKey =
   'guitar-note-map.midi-instrument.v1'
 export const ListenAnalysisModeStorageKey =
-  'guitar-note-map.listenAnalysisMode.v1'
+  'guitar-note-map.listen-analysis-mode.v1'
 
 interface PreferencesStorage {
   getItem: (key: string) => string | null
