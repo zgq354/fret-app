@@ -13,7 +13,6 @@ Fret & Key is a static browser application for learning the relationship between
 | Path | Scope |
 | --- | --- |
 | `src/App.tsx` | Application composition and cross-module interaction policy; it does not contain independent pitch, notation, audio, or release algorithms. |
-| `src/app/` | Page-level React sections composed by `App.tsx`; they receive view state and callbacks without taking over audio, MIDI, or playback lifecycle. |
 | `src/music/` | Pure music theory, chord analysis, fretboard geometry, and staff-note transforms. Keep browser APIs and React out. |
 | `src/audio/` | Microphone capture, monophonic and polyphonic analysis, worklet / Worker clients, and audio settings. |
 | `src/learning/` | Learning-mode state and play-session policy. |
@@ -21,7 +20,7 @@ Fret & Key is a static browser application for learning the relationship between
 | `src/midi/` | Web MIDI input adapter and session lifecycle. |
 | `src/settings/` | Persisted display preferences and normalization. |
 | `src/platform/` | Browser-host adapters for Local Edge diagnostics and release updates. |
-| `src/components/` | React views and interaction controls; feature-specific UI stays with the surface where it is used. |
+| `src/components/` | React views and interaction controls, including page panels. They receive state and callbacks without taking over audio, MIDI, or playback lifecycle. |
 | `public/` | Static assets, PWA metadata, the PCM worklet, and host routing artifacts. |
 | `tests/` | Unit and browser evidence, grouped by runtime module; `tests/e2e/` covers public behavior and Local Edge releases. |
 

@@ -16,11 +16,13 @@ import { usePitchDetection } from './audio/usePitchDetection'
 import { usePolyphonicPitchDetection } from './audio/usePolyphonicPitchDetection'
 import {
   FretboardSurface,
-} from './app/FretboardSurface'
+} from './components/FretboardSurface/FretboardSurface'
+import { KeyboardPanel } from './components/KeyboardPanel/KeyboardPanel'
 import {
   LearningPanel,
   type ListenAnalysisMode,
-} from './app/LearningPanel'
+} from './components/LearningPanel/LearningPanel'
+import { NotationPanel } from './components/NotationPanel/NotationPanel'
 import { resolvePolyphonicFeedback } from './audio/polyphonicFeedback'
 import type {
   PolyphonicAnalysisState,
@@ -31,12 +33,8 @@ import {
   GestureModeSwitch,
   type PlayGestureMode,
 } from './components/GestureModeSwitch/GestureModeSwitch'
-import { PianoKeyboard } from './components/PianoKeyboard/PianoKeyboard'
 import { TechnicalSettingsDialog } from './components/TechnicalSettings/TechnicalSettingsDialog'
-import {
-  StaffView,
-  type StaffNotationMode,
-} from './components/StaffView/StaffView'
+import { type StaffNotationMode } from './components/StaffView/StaffView'
 import {
   canPromptPlayMode,
   resolveLearningDisplay,
@@ -760,104 +758,38 @@ function App() {
         </section>
 
         <section className="secondary-grid">
-          <article className="visual-card piano-card">
-            <div className="card-heading piano-heading">
-              <div className="piano-title">
-                <p className="card-kicker">Keyboard</p>
-                <h2>钢琴键盘</h2>
-              </div>
-              {learningMode === 'play' ? (
-                <GestureModeSwitch
-                  className="piano-gesture-control"
-                  label="键盘手势"
-                  mode={pianoGestureMode}
-                  onChange={setPianoGestureMode}
-                />
-              ) : null}
-              <span className="card-note piano-range-note">
-                {formatNoteLabel(
-                  midiToNote(36),
-                  displaySettings.middleCStyle,
-                )}{' '}
-                —{' '}
-                {formatNoteLabel(
-                  midiToNote(96),
-                  displaySettings.middleCStyle,
-                )}
-              </span>
-            </div>
-            <div className="piano-scroll">
-              <PianoKeyboard
-                midi={activeMidi}
-                middleCStyle={displaySettings.middleCStyle}
-                midis={displayMidis}
-                activeMidis={soundingMidis}
-                releasingMidis={playSession.releasingMidis}
-                showPitchClass={showPitchClass}
-                playable={learningMode === 'play'}
-                interactive={learningMode === 'play' || canInvitePlayMode}
-                glissandoEnabled={
-                  learningMode === 'play' &&
-                  pianoGestureMode === 'glissando'
-                }
-                onPlayKey={(midi) =>
-                  playNote({
-                    midi,
-                    instrumentId: 'piano',
-                    source: 'piano',
-                  })
-                }
-                onStartKey={(pointerId, midi) =>
-                  startPlayVoice('piano:' + pointerId, {
-                    midi,
-                    instrumentId: 'piano',
-                    source: 'piano',
-                  })
-                }
-                onEndKey={(pointerId) =>
-                  stopPlayVoice('piano:' + pointerId)
-                }
-              />
-            </div>
-          </article>
-
-          <article className="visual-card staff-card">
-            <div className="card-heading">
-              <div>
-                <p className="card-kicker">Notation</p>
-                <h2>五线谱</h2>
-              </div>
-              <div
-                className="compact-switch notation-mode-switch"
-                aria-label="记谱模式"
-              >
-                <button
-                  type="button"
-                  className={notationMode === 'guitar' ? 'is-selected' : ''}
-                  aria-pressed={notationMode === 'guitar'}
-                  onClick={() => setNotationMode('guitar')}
-                >
-                  吉他记谱
-                </button>
-                <button
-                  type="button"
-                  className={notationMode === 'concert' ? 'is-selected' : ''}
-                  aria-pressed={notationMode === 'concert'}
-                  onClick={() => setNotationMode('concert')}
-                >
-                  实际音高
-                </button>
-              </div>
-            </div>
-            <StaffView
-              midi={activeMidi}
-              middleCStyle={displaySettings.middleCStyle}
-              midis={displayMidis}
-              activeMidis={soundingMidis}
-              releasingMidis={playSession.releasingMidis}
-              mode={notationMode}
-            />
-          </article>
+          <KeyboardPanel
+            learningMode={learningMode}
+            canInvitePlayMode={canInvitePlayMode}
+            activeMidi={activeMidi}
+            middleCStyle={displaySettings.middleCStyle}
+            displayMidis={displayMidis}
+            soundingMidis={soundingMidis}
+            releasingMidis={playSession.releasingMidis}
+            showPitchClass={showPitchClass}
+            gestureMode={pianoGestureMode}
+            onGestureModeChange={setPianoGestureMode}
+            onPlayKey={(midi) =>
+              playNote({ midi, instrumentId: 'piano', source: 'piano' })
+            }
+            onStartKey={(pointerId, midi) =>
+              startPlayVoice('piano:' + pointerId, {
+                midi,
+                instrumentId: 'piano',
+                source: 'piano',
+              })
+            }
+            onEndKey={(pointerId) => stopPlayVoice('piano:' + pointerId)}
+          />
+          <NotationPanel
+            activeMidi={activeMidi}
+            middleCStyle={displaySettings.middleCStyle}
+            displayMidis={displayMidis}
+            soundingMidis={soundingMidis}
+            releasingMidis={playSession.releasingMidis}
+            mode={notationMode}
+            onModeChange={setNotationMode}
+          />
         </section>
       </main>
     </div>

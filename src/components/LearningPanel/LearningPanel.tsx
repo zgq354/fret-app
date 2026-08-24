@@ -1,18 +1,18 @@
-import { MidiInputControl } from '../components/MidiInputControl/MidiInputControl'
-import { PitchMeter } from '../components/PitchMeter/PitchMeter'
-import type { PolyphonicFeedback } from '../audio/polyphonicFeedback'
-import type { PolyphonicAnalysisState } from '../audio/polyphonicInferenceMessages'
-import type { ChordReading } from '../music/chordAnalysis'
+import { MidiInputControl } from '../MidiInputControl/MidiInputControl'
+import { PitchMeter } from '../PitchMeter/PitchMeter'
+import type { PolyphonicFeedback } from '../../audio/polyphonicFeedback'
+import type { PolyphonicAnalysisState } from '../../audio/polyphonicInferenceMessages'
+import type { ChordReading } from '../../music/chordAnalysis'
 import {
   formatNoteLabel,
   midiToFrequency,
   midiToNote,
   type MiddleCStyle,
   type PitchReading,
-} from '../music/musicTheory'
-import type { MidiInputState } from '../midi/useMidiInput'
-import type { InstrumentId } from '../playback/instrument'
-import type { LearningMode } from '../learning/playMode'
+} from '../../music/musicTheory'
+import type { MidiInputState } from '../../midi/useMidiInput'
+import type { InstrumentId } from '../../playback/instrument'
+import type { LearningMode } from '../../learning/playMode'
 
 export type ListenAnalysisMode = 'single' | 'polyphonic'
 
