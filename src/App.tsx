@@ -1,11 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import './App.css'
-import {
-  DEFAULT_AUDIO_SETTINGS,
-  loadAudioSettings,
-  normalizeAudioSettings,
-  saveAudioSettings,
-} from './audio/audioSettings'
+import { useAudioSettings } from './audio/react/useAudioSettings'
 import { usePitchDetection } from './audio/usePitchDetection'
 import { usePolyphonicPitchDetection } from './audio/usePolyphonicPitchDetection'
 import {
@@ -59,12 +54,7 @@ import { setFwaDebugEnabled } from './platform/fwa-debug-state/fwa-debug-state'
 import { useFwaDebugState } from './platform/fwa-debug-state/react/useFwaDebugState'
 import { applyFwaUpdate } from './platform/fwa-update/fwa-update'
 import { useFwaUpdateState } from './platform/fwa-update/react/useFwaUpdateState'
-import {
-  DefaultDisplaySettings,
-  loadDisplaySettings,
-  normalizeDisplaySettings,
-  saveDisplaySettings,
-} from './settings/displaySettings'
+import { useDisplaySettings } from './settings/react/useDisplaySettings'
 
 const MIN_DEMO_MIDI = 40
 const MAX_DEMO_MIDI = 88
@@ -83,8 +73,16 @@ function App() {
   const [practiceStringMode, setPracticeStringMode] = useState(
     () => loadPersistentBoolean(PRACTICE_MODE_STORAGE_KEY, false),
   )
-  const [audioSettings, setAudioSettings] = useState(loadAudioSettings)
-  const [displaySettings, setDisplaySettings] = useState(loadDisplaySettings)
+  const {
+    settings: audioSettings,
+    updateSettings: updateAudioSettings,
+    resetSettings: resetAudioSettings,
+  } = useAudioSettings()
+  const {
+    settings: displaySettings,
+    updateSettings: updateDisplaySettings,
+    resetSettings: resetDisplaySettings,
+  } = useDisplaySettings()
   const fwaDebugState = useFwaDebugState()
   const fwaUpdateState = useFwaUpdateState()
   const [stickyPitch, setStickyPitch] = useState(false)
@@ -253,14 +251,6 @@ function App() {
   }, [isListening, polyphonicPitchDetection.reading])
 
   useEffect(() => {
-    saveAudioSettings(audioSettings)
-  }, [audioSettings])
-
-  useEffect(() => {
-    saveDisplaySettings(displaySettings)
-  }, [displaySettings])
-
-  useEffect(() => {
     savePersistentBoolean(
       PRACTICE_MODE_STORAGE_KEY,
       practiceStringMode,
@@ -274,22 +264,6 @@ function App() {
   useEffect(() => {
     saveListenAnalysisMode(listenAnalysisMode)
   }, [listenAnalysisMode])
-
-  const updateAudioSettings = (
-    patch: Partial<typeof audioSettings>,
-  ) => {
-    setAudioSettings((current) =>
-      normalizeAudioSettings({ ...current, ...patch }),
-    )
-  }
-
-  const updateDisplaySettings = (
-    patch: Partial<typeof displaySettings>,
-  ) => {
-    setDisplaySettings((current) =>
-      normalizeDisplaySettings({ ...current, ...patch }),
-    )
-  }
 
   const updateFwaDebugEnabled = (enabled: boolean) => {
     setFwaDebugEnabled(enabled)
@@ -467,8 +441,8 @@ function App() {
                 onFwaDebugChange={updateFwaDebugEnabled}
                 onApplyFwaUpdate={applyFwaUpdate}
                 onReset={() => {
-                  setAudioSettings({ ...DEFAULT_AUDIO_SETTINGS })
-                  setDisplaySettings({ ...DefaultDisplaySettings })
+                  resetAudioSettings()
+                  resetDisplaySettings()
                 }}
                 onDismiss={() => {
                   setTechnicalSettingsOpen(false)
