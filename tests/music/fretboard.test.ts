@@ -4,7 +4,7 @@ import {
   findPitchClassPositions,
   fretLineRatio,
   getFretPosition,
-} from './fretboard'
+} from '../../src/music/fretboard'
 
 describe('fretboard model', () => {
   it('finds every E4 position on the default 20-fret guitar', () => {

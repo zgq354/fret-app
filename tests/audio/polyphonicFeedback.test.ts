@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { resolvePolyphonicFeedback } from './polyphonicFeedback'
+import { resolvePolyphonicFeedback } from '../../src/audio/polyphonicFeedback'
 
 describe('polyphonic feedback', () => {
   it('makes model loading explicit', () => {

@@ -4,11 +4,11 @@ import {
   PolyphonicInferenceBusy,
   PolyphonicWorkerTerminated,
   type PolyphonicWorkerPort,
-} from './polyphonicInferenceClient'
+} from '../../src/audio/polyphonicInferenceClient'
 import type {
   PolyphonicWorkerRequest,
   PolyphonicWorkerResponse,
-} from './polyphonicInferenceMessages'
+} from '../../src/audio/polyphonicInferenceMessages'
 
 const settings = {
   minFrequency: 65,

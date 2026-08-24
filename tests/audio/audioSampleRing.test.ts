@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { AudioSampleRing } from './audioSampleRing'
+import { AudioSampleRing } from '../../src/audio/audioSampleRing'
 
 describe('AudioSampleRing', () => {
   it('returns the newest samples in chronological order', () => {

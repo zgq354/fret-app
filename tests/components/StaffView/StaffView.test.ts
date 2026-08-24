@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { createStaffNotes } from './staffNotes'
+import { createStaffNotes } from '../../../src/components/StaffView/staffNotes'
 
 describe('createStaffNotes', () => {
   it('sorts a chord by staff position and removes duplicate pitches', () => {

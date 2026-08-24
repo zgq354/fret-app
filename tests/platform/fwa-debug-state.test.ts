@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { projectFwaDebugState } from './fwa-debug-state'
+import { projectFwaDebugState } from '../../src/platform/fwa-debug-state'
 
 describe('FWA debug state', () => {
   it('projects the SDK debug facade for the settings UI', () => {

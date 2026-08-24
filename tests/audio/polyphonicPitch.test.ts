@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   selectSimultaneousNotes,
   type TimedPitchEvent,
-} from './polyphonicPitch'
+} from '../../src/audio/polyphonicPitch'
 
 function note(
   pitchMidi: number,

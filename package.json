@@ -22,7 +22,7 @@
     "check:site": "node scripts/check-site.mjs dist",
     "check:pwa": "node scripts/check-pwa.mjs dist",
     "ci": "pnpm lint && pnpm typecheck && pnpm test && pnpm e2e:local-edge && pnpm build",
-    "e2e:local-edge": "playwright test e2e/local-edge.e2e.ts",
+    "e2e:local-edge": "playwright test tests/e2e/local-edge.e2e.ts",
     "lint": "oxlint",
     "preview": "vite preview",
     "test": "vitest run",

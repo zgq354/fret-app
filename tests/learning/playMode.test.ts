@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest'
 import {
   createPitchReading,
   MiddleCStyle,
-} from '../music/musicTheory'
-import { canPromptPlayMode, resolveLearningDisplay } from './playMode'
+} from '../../src/music/musicTheory'
+import { canPromptPlayMode, resolveLearningDisplay } from '../../src/learning/playMode'
 
 const baseInput = {
   mode: 'listen' as const,

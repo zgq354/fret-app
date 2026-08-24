@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { createMidiVoiceId, parseMidiMessage } from './midiMessage'
+import { createMidiVoiceId, parseMidiMessage } from '../../src/midi/midiMessage'
 
 describe('parseMidiMessage', () => {
   it('parses note on with channel and normalized velocity', () => {

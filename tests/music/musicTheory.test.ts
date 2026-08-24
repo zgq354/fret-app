@@ -8,7 +8,7 @@ import {
   MiddleCStyle,
   midiToFrequency,
   midiToNote,
-} from './musicTheory'
+} from '../../src/music/musicTheory'
 
 describe('music theory conversions', () => {
   it('uses A4 = 440 Hz as the tuning reference', () => {

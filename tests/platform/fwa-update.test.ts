@@ -3,7 +3,7 @@ import type { LocalEdgeClientState } from '@fullstack-webapp/local-edge/client'
 import {
   formatFwaReleaseId,
   projectFwaUpdateState,
-} from './fwa-update'
+} from '../../src/platform/fwa-update'
 
 describe('FWA update state', () => {
   it('projects the framework-neutral release contract', () => {

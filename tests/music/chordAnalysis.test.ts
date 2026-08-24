@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { createChordReading } from './chordAnalysis'
+import { createChordReading } from '../../src/music/chordAnalysis'
 
 describe('chord analysis', () => {
   it('uses Tonal to name a recognized pitch set', () => {

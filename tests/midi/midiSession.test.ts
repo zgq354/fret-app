@@ -3,7 +3,7 @@ import {
   createMidiSessionState,
   reduceMidiSession,
   type MidiInputDevice,
-} from './midiSession'
+} from '../../src/midi/midiSession'
 
 const keyboard: MidiInputDevice = { id: 'keyboard', name: 'Keyboard' }
 const pads: MidiInputDevice = { id: 'pads', name: 'Pads' }

@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import { MiddleCStyle } from '../music/musicTheory'
+import { MiddleCStyle } from '../../src/music/musicTheory'
 import {
   DefaultDisplaySettings,
   DisplaySettingsStorageKey,
   loadDisplaySettings,
   normalizeDisplaySettings,
   saveDisplaySettings,
-} from './displaySettings'
+} from '../../src/settings/displaySettings'
 
 describe('display settings', () => {
   it('uses scientific pitch notation by default', () => {
