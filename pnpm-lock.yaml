@@ -25,8 +25,8 @@ importers:
         version: 19.2.7(react@19.2.7)
     devDependencies:
       '@fullstack-webapp/local-edge':
-        specifier: 0.1.0-beta.2
-        version: 0.1.0-beta.2(vite@8.1.5(@types/node@24.13.3)(esbuild@0.28.1))
+        specifier: 0.1.0-beta.5
+        version: 0.1.0-beta.5(vite@8.1.5(@types/node@24.13.3)(esbuild@0.28.1))
       '@playwright/test':
         specifier: 1.61.1
         version: 1.61.1
@@ -278,8 +278,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@fullstack-webapp/local-edge@0.1.0-beta.2':
-    resolution: {integrity: sha512-nDt+M0pD8V/ROXRnWnxrSqp/JGBkKdSkl9suuClQVFABUtwLK/1Ve7/T4138iN0hZrjdgIi7alAc7rfKqixrEA==}
+  '@fullstack-webapp/local-edge@0.1.0-beta.5':
+    resolution: {integrity: sha512-Q8Yr/dgC2MfTDcRUYZNyQ4/gyd/FtSHSZ1YIvyq3e5wDeEWghpBMq43Pa2o2P41vXdSuPw05veY9zj5ftyUgBQ==}
     engines: {node: ^20.19.0 || >=22.12.0}
     hasBin: true
     peerDependencies:
@@ -1798,7 +1798,7 @@ snapshots:
   '@esbuild/win32-x64@0.28.1':
     optional: true
 
-  '@fullstack-webapp/local-edge@0.1.0-beta.2(vite@8.1.5(@types/node@24.13.3)(esbuild@0.28.1))':
+  '@fullstack-webapp/local-edge@0.1.0-beta.5(vite@8.1.5(@types/node@24.13.3)(esbuild@0.28.1))':
     dependencies:
       vite: 8.1.5(@types/node@24.13.3)(esbuild@0.28.1)
 
